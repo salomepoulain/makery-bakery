@@ -1,5 +1,13 @@
 <img src="makery-bakery.png" width="400" alt="makery-bakery">
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Latest release](https://img.shields.io/github/v/tag/salomepoulain/makery-bakery?label=version)](https://github.com/salomepoulain/makery-bakery/releases)
+[![Shell scripts](https://img.shields.io/badge/Shell%20scripts-38-blue?logo=gnubash)](https://github.com/salomepoulain/makery-bakery/search?l=sh)
+[![CI](https://img.shields.io/github/actions/workflow/status/salomepoulain/makery-bakery/test.yml?label=CI&logo=github)](https://github.com/salomepoulain/makery-bakery/actions)
+[![Pre-commit](https://img.shields.io/badge/Pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+
+⭐ Starred **<sub><sup>[![GitHub stars](https://img.shields.io/github/stars/salomepoulain/makery-bakery?label=&logo=github&color=yellow&labelColor=black)](https://github.com/salomepoulain/makery-bakery/stargazers)</sup></sub>** · 🍴 **<sub><sup>[![GitHub forks](https://img.shields.io/github/forks/salomepoulain/makery-bakery?label=&logo=github&color=yellow&labelColor=black)](https://github.com/salomepoulain/makery-bakery/network/members)</sup></sub>** · 📋 **<sub><sup>[![GitHub issues](https://img.shields.io/github/issues/salomepoulain/makery-bakery?label=&logo=github&color=yellow&labelColor=black)](https://github.com/salomepoulain/makery-bakery/issues)</sup></sub>** · 👁️ **<sub><sup>[![GitHub watchers](https://img.shields.io/github/watchers/salomepoulain/makery-bakery?label=&logo=github&color=yellow&labelColor=black)](https://github.com/salomepoulain/makery-bakery/watchers)</sup></sub>** · 👥 **<sub><sup>[![GitHub contributors](https://img.shields.io/github/contributors/salomepoulain/makery-bakery?label=&logo=github&color=yellow&labelColor=black)](https://github.com/salomepoulain/makery-bakery/graphs/contributors)</sup></sub>** · 📦 **<sub><sup>[![Repo size](https://img.shields.io/github/repo-size/salomepoulain/makery-bakery?label=&logo=github&color=yellow&labelColor=black)](https://github.com/salomepoulain/makery-bakery)</sup></sub>**
+
 > A modular recipe-book system for your project's development environment.
 
 `makery-bakery` is a declarative scaffolding system powered by Make. Instead of copying Makefiles between projects, you hire specialized **Stations** to set up environments and run tasks. Think of it as a package manager for boilerplate with personality.
