@@ -19,11 +19,23 @@ fi
 # shellcheck source=../personality.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../personality.sh"
 
+find_project_root() {
+    local current="$PWD"
+    while [[ "$current" != "/" ]]; do
+        if [[ -d "$current/.makery" ]]; then
+            echo "$current"
+            return 0
+        fi
+        current=$(dirname "$current")
+    done
+    return 1
+}
+
 H_STARTER "ACCEPTING MAKERY UPDATES"
 
 # Verify git repo
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || {
-    H_SAY "Error: not in a git repository"
+REPO_ROOT=$(find_project_root) || {
+    H_SAY "Error: .makery folder not found"
     exit 1
 }
 
