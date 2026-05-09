@@ -1,0 +1,9 @@
+# ============================================================================
+#  LINE COOK CONTRACT: DEPENDENCY (System Tools)
+# ============================================================================
+# List system-level commands that must be installed for this cook to work.
+# The Head Chef will check the $PATH before hiring them.
+
+# Example:
+# uv
+# jq

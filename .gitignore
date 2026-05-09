@@ -1,0 +1,46 @@
+# Multi-makery
+.makery/
+/bake
+TODO
+
+# IDE
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# System
+.DS_Store
+
+# Secrets
+.env
+.env.*
+
+# Claude (personal config)
+.claude/
+.git/
+
+CLAUDE.md
+settings.local.json
+.claude
+.claude-free
+CLAUDE.md.bak.*
+
+
+temp/
+
+*.txt
+*.tar.*

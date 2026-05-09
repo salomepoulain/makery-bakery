@@ -1,0 +1,33 @@
+name: CI Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Lint scripts with shellcheck
+        run: |
+          find . -name "*.sh" -not -path "./.git/*" -exec shellcheck -e SC1091 {} +
+
+      - name: Test install_make.sh (make-only setup)
+        run: |
+          mkdir -p /tmp/test-make-only
+          cd /tmp/test-make-only
+          bash ${{ github.workspace }}/install/install_make.sh
+          make germs
+          make menu
+
+      - name: Run shell script tests
+        run: |
+          bash ${{ github.workspace }}/tests/test_bake_routing.sh
+          bash ${{ github.workspace }}/tests/test_headchef_commands.sh

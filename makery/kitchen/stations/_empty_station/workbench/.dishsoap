@@ -1,0 +1,9 @@
+# ============================================================================
+#  LINE COOK STATION: MESS (Local Artifacts)
+# ============================================================================
+# List files or folders that pile up while this cook is working.
+# When the Head Chef calls `bake germs`, everything listed here is deleted.
+
+# Example:
+# __pycache__
+# .pytest_cache

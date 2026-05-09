@@ -1,0 +1,9 @@
+# ============================================================================
+#  LINE COOK STATION: CONTRABAND (.gitignore entries)
+# ============================================================================
+# List files or folders that the Git Health Inspector should never see.
+# When this cook is hired, these lines are appended to the project .gitignore.
+
+# Example:
+# .venv/
+# __pycache__/
