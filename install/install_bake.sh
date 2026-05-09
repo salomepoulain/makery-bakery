@@ -252,7 +252,7 @@ if [ $# -eq 0 ]; then
     _bake_logo
 fi
 
-# Route to make. empty-station is excluded from single-station auto-routing.
+# Route to make. _empty_station is excluded from single-station auto-routing.
 if [ $# -ge 2 ] && [[ ! "$2" == *=* ]]; then
     _bake_first="$1"; _bake_second="$2"; shift 2
     make -f .makery/menu.mk "$_bake_first" s="$_bake_second" "$@" 2>/dev/null || \
@@ -262,7 +262,7 @@ elif [ $# -eq 1 ] && [[ ! "$1" == *=* ]]; then
         _stations=()
         for _d in .makery/kitchen/stations/*/; do
             [ -d "$_d" ] || continue
-            [ "$(basename "$_d")" = "empty-station" ] && continue
+            [ "$(basename "$_d")" = "_empty_station" ] && continue
             _stations+=("$_d")
         done
         if [ ${#_stations[@]} -eq 1 ]; then
