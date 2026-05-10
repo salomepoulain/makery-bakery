@@ -66,19 +66,21 @@ H_SAY "✓ Found: $dep"
 fi
 
 # --- 2. Pantry (Static files) ---
-if [ -d "$STATION_DIR/workbench/pantry" ]; then
-H_SAY "Unpacking pantry ingredients..."
-    for item in "$STATION_DIR/workbench/pantry"/*; do
-        [ -f "$item" ] || continue
-        filename=$(basename "$item")
-        if [ ! -e "$filename" ]; then
-            cp "$item" "$filename"
-H_SAY "+ Stocked: $filename"
-        else
-H_SAY "~ Already stocked: $filename"
-        fi
-    done
-fi
+# Pantry unpacking is now handled explicitly in hired.sh, not auto-copied
+# If a cook needs to unpack pantry items to the root, they should do so in their hired.sh
+# if [ -d "$STATION_DIR/workbench/pantry" ]; then
+# H_SAY "Unpacking pantry ingredients..."
+#     for item in "$STATION_DIR/workbench/pantry"/*; do
+#         [ -f "$item" ] || continue
+#         filename=$(basename "$item")
+#         if [ ! -e "$filename" ]; then
+#             cp "$item" "$filename"
+# H_SAY "+ Stocked: $filename"
+#         else
+# H_SAY "~ Already stocked: $filename"
+#         fi
+#     done
+# fi
 
 # --- 3. Contraband ---
 if [ -f "$STATION_DIR/workbench/.contraband" ]; then
