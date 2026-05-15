@@ -280,8 +280,11 @@ __BAKE_HEAD_EOF__
   base64 < "$TMP_TARBALL"
 } > "$BAKE_PATH"
 
-# Substitute the version placeholder with the actual release tag
-sed -i '' "s/__BAKE_VERSION__/$RELEASE_TAG/" "$BAKE_PATH"
+# Substitute the version placeholder with the actual release tag.
+# Avoid sed -i here because BSD sed and GNU sed use different argument forms.
+TMP_BAKE_PATH=$(mktemp)
+sed "s/__BAKE_VERSION__/$RELEASE_TAG/" "$BAKE_PATH" > "$TMP_BAKE_PATH"
+mv "$TMP_BAKE_PATH" "$BAKE_PATH"
 
 chmod +x "$BAKE_PATH"
 rm "$TMP_TARBALL" "$TMP_CHECKSUM"
