@@ -83,9 +83,8 @@ fi
 # fi
 
 # --- 3. Contraband ---
-if [ -f "$STATION_DIR/workbench/.contraband" ]; then
+if [ -f "$STATION_DIR/workbench/.contraband" ] && [ -f ".gitignore" ]; then
 H_SAY "Hiding contraband..."
-    touch .gitignore
     while IFS= read -r line || [ -n "$line" ]; do
         [[ -z "$line" || "$line" == "#"* ]] && continue
         if ! grep -Fxq "$line" .gitignore; then

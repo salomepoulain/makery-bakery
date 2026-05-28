@@ -191,11 +191,6 @@ _bake_extract() {
         [ "$_upgraded" -eq 0 ] && echo "Installed .makery/ from embedded payload ($BAKE_VERSION)."
     fi
     chmod +x .makery/kitchen/headchef/orders/*.sh 2>/dev/null
-    if [ -f .gitignore ]; then
-        grep -q '^\.makery/$' .gitignore || printf '\n# --- MAKERY ---\n.makery/\n' >> .gitignore
-    else
-        echo ".makery/" > .gitignore
-    fi
     rm -f bake 2>/dev/null
 }
 

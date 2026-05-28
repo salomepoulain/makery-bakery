@@ -59,17 +59,7 @@ fi
 # 3. Set permissions for the Head Chef's orders
 chmod +x .makery/kitchen/headchef/orders/*.sh
 
-# 4. Hide the kitchen from Git
-if [ -f ".gitignore" ]; then
-    if ! grep -q "^\.makery/$" .gitignore; then
-        echo -e "\n# --- MAKERY ---" >> .gitignore
-        echo ".makery/" >> .gitignore
-    fi
-else
-    echo ".makery/" > .gitignore
-fi
-
-# 5. Safety check: Ensure no local 'bake' file clutters the workspace
+# 4. Safety check: Ensure no local 'bake' file clutters the workspace
 rm -f bake 2>/dev/null
 
 FINISHED "✓ Local kitchen is open and ready."
