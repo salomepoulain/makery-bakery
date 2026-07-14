@@ -37,10 +37,18 @@ if [ -f "$STATION_DIR/workbench/.dishsoap" ]; then
      H_SAY "Scrubbing the workbench before tearing it down..."
      while IFS= read -r path_to_clean || [ -n "$path_to_clean" ]; do
         if [[ -z "$path_to_clean" || "$path_to_clean" == \#* ]]; then continue; fi
-        if [ -e "$path_to_clean" ]; then
-            rm -rf "$path_to_clean"
-            H_SAY "- Wiped: $path_to_clean"
-        fi
+
+        # Expand glob patterns (e.g. *.aux, report/**/*.aux) as well as literal paths
+        shopt -s nullglob globstar
+        matches=( $path_to_clean )
+        shopt -u nullglob globstar
+
+        for match in "${matches[@]}"; do
+            if [ -e "$match" ]; then
+                rm -rf "$match"
+                H_SAY "- Wiped: $match"
+            fi
+        done
     done < "$STATION_DIR/workbench/.dishsoap"
 fi
 
