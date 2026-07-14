@@ -129,6 +129,9 @@ git clone --depth 1 "$STATIONS_REPO" "$TEMP_DIR/stations" 2>/dev/null || { H_SAY
 LOCAL_STATIONS="$REPO_ROOT/.makery/kitchen/stations"
 CLOUD_STATIONS="$TEMP_DIR/stations/stations"
 
+LOCAL_HEADCHEF="$REPO_ROOT/.makery/kitchen/headchef"
+CLOUD_HEADCHEF="$TEMP_DIR/multi/makery/kitchen/headchef"
+
 
 # ============================================================================
 # PROCESS STATIONS
@@ -177,6 +180,58 @@ if show_changes "Comparing stations" "$LOCAL_STATIONS" "$CLOUD_STATIONS" true "_
                     PR=$(gh pr create --repo "salomepoulain/makery-stations" \
                         --title "Sync stations updates" \
                         --body "Automated sync of stations changes." \
+                        --head "$BRANCH" --base main 2>&1)
+                    H_SAY "✓ PR: $PR"
+                    ;;
+            esac
+        fi
+    fi
+else
+    H_SAY "No changes"
+fi
+
+# ============================================================================
+# PROCESS HEADCHEF
+# ============================================================================
+H_SAY "=== HEADCHEF ==="
+
+if show_changes "Comparing headchef" "$LOCAL_HEADCHEF" "$CLOUD_HEADCHEF" true; then
+    if [ "$DRY_RUN" = true ]; then
+        H_SAY "[DRY RUN] Would create or update PR on branch sync/headchef"
+    else
+        BRANCH="sync/headchef"
+        WORK_MULTI="$TEMP_DIR/multi-work"
+        prepare_branch "salomepoulain/makery-bakery" "$MULTI_REPO" "$BRANCH" "$WORK_MULTI" \
+            || { H_SAY "Failed to prepare work clone"; exit 1; }
+
+        MODE=$(cat "$WORK_MULTI/.sync-mode"); rm "$WORK_MULTI/.sync-mode"
+        cd "$WORK_MULTI" || exit 1
+
+        mkdir -p makery/kitchen/headchef
+        rm -rf makery/kitchen/headchef
+        cp -r "$LOCAL_HEADCHEF" makery/kitchen/headchef
+        git add -A makery/kitchen/headchef
+
+        if [ "$(git diff --cached --name-only | grep -v "^makery/kitchen/headchef/" | grep -c .)" -gt 0 ]; then
+            H_SAY "Error: Non-headchef files detected. Aborting."
+            exit 1
+        fi
+
+        if git diff --cached --quiet; then
+            H_SAY "Branch already matches local state, nothing to push"
+        else
+            git commit -m "Sync headchef updates ($TIMESTAMP)" >/dev/null
+            git push --force-with-lease origin "$BRANCH" >/dev/null 2>&1 \
+                || { H_SAY "Push failed"; exit 1; }
+
+            case "$MODE" in
+                update:*)
+                    H_SAY "✓ Updated existing PR #${MODE#update:}"
+                    ;;
+                create)
+                    PR=$(gh pr create --repo "salomepoulain/makery-bakery" \
+                        --title "Sync headchef updates" \
+                        --body "Automated sync of headchef changes." \
                         --head "$BRANCH" --base main 2>&1)
                     H_SAY "✓ PR: $PR"
                     ;;

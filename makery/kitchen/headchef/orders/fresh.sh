@@ -22,14 +22,21 @@ clean_station() {
             # FIXED: Added quotes around the # to prevent Bash syntax SAYs
             if [[ -z "$path_to_clean" || "$path_to_clean" == "#"* ]]; then continue; fi
 
-            if [ -e "$path_to_clean" ]; then
-                rm -rf "$path_to_clean"
-                if [ "$cleaned" = false ]; then
+            # Expand glob patterns (e.g. *.aux, report/**/*.aux) as well as literal paths
+            shopt -s nullglob globstar
+            local matches=( $path_to_clean )
+            shopt -u nullglob globstar
+
+            for match in "${matches[@]}"; do
+                if [ -e "$match" ]; then
+                    rm -rf "$match"
+                    if [ "$cleaned" = false ]; then
 H_SAY "The cook is scrubbing the '$station_name' workbench:"
-                     cleaned=true
+                         cleaned=true
+                    fi
+H_SAY "- Scrubbed: $match"
                 fi
-H_SAY "- Scrubbed: $path_to_clean"
-            fi
+            done
         done < "$station_dir/workbench/.dishsoap"
     fi
 }
