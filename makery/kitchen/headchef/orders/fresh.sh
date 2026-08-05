@@ -24,6 +24,7 @@ clean_station() {
 
             # Expand glob patterns (e.g. *.aux, report/**/*.aux) as well as literal paths
             shopt -s nullglob globstar
+            # shellcheck disable=SC2206 # intentional: splitting a glob pattern into matches
             local matches=( $path_to_clean )
             shopt -u nullglob globstar
 
