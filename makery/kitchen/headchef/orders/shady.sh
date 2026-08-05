@@ -147,6 +147,15 @@ H_SAY "Both local and .shadow/ have $station_name's $match — skipping, resolve
 H_SAY "+ Stashed ($station_name): $match"
         done
     done < "$contraband"
+
+    # Let the station react to going shady (e.g. relocating memory into the stash).
+    if [ -f "$station_dir/cook/contract/illegal.sh" ]; then
+        if [ -f "$station_dir/cook/personality.sh" ]; then
+            # shellcheck source=/dev/null
+            source "$station_dir/cook/personality.sh"
+        fi
+        REPO_ROOT="$REPO_ROOT" SHADOW_DIR="$SHADOW_DIR" bash "$station_dir/cook/contract/illegal.sh"
+    fi
 }
 
 if [ -d "$STATIONS_DIR" ]; then
