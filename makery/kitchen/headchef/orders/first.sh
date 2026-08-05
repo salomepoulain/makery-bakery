@@ -94,7 +94,13 @@ H_SAY "+ Hidden: $line"
     done < "$STATION_DIR/workbench/.contraband"
 fi
 
-# --- 4. Setup Script ---
+# --- 4. Auto-stash (if this project has already gone shady) ---
+if [ -L "__STASH__" ]; then
+H_SAY "This project is already shady — stashing the new cook's contraband too..."
+    bash "$KITCHEN_ROOT/headchef/orders/shady.sh"
+fi
+
+# --- 5. Setup Script ---
 if [ -f "$STATION_DIR/cook/contract/hired.sh" ]; then
     if [ -f "$STATION_DIR/cook/personality.sh" ]; then
         # shellcheck source=/dev/null

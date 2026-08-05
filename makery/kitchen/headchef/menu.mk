@@ -11,6 +11,7 @@ menu::
 		ITEM "germs" 		"Force all cooks to use their dishsoap" && \
 		ITEM "all" 			"Bake everything at once, closes the makery" && \
 		ITEM "station"		"Create a new station to modify according to your wishes" && \
+		ITEM "shady"		"Move this project'\''s contraband into .shadow/ and leave symlinks behind" && \
 		ITEM "request" 		"Send pull request with your station updates to the registry" && \
 		H_LINE'
 
@@ -65,3 +66,6 @@ release::
 
 station::
 	@bash .makery/kitchen/headchef/orders/station.sh $(s)
+
+shady::
+	@bash .makery/kitchen/headchef/orders/shady.sh
