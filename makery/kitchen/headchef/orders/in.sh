@@ -50,6 +50,7 @@ CURRENT_USER=$(gh api user --jq '.login' 2>/dev/null) || {
 
 # Config
 STATIONS_REPO="salomepoulain/makery-stations"
+MULTI_REPO="salomepoulain/makery-bakery"
 REPO_OWNER="salomepoulain"
 
 # Check permissions for stations repo
@@ -62,6 +63,21 @@ case "$PERM" in
     ADMIN|MAINTAIN) ;;
     *)
         H_SAY "Error: you ($CURRENT_USER) do not have admin/maintain rights on $STATIONS_REPO"
+        H_SAY "Only $REPO_OWNER can bake in changes. Contact the repo owner."
+        exit 1
+        ;;
+esac
+
+# Check permissions for headchef/multi repo
+PERM=$(gh repo view "$MULTI_REPO" --json viewerPermission --jq '.viewerPermission' 2>/dev/null) || {
+    H_SAY "Error: cannot access repo $MULTI_REPO (check permissions and authentication)"
+    exit 1
+}
+
+case "$PERM" in
+    ADMIN|MAINTAIN) ;;
+    *)
+        H_SAY "Error: you ($CURRENT_USER) do not have admin/maintain rights on $MULTI_REPO"
         H_SAY "Only $REPO_OWNER can bake in changes. Contact the repo owner."
         exit 1
         ;;
@@ -372,6 +388,9 @@ TOTAL_MERGED=0
 process_repo "$STATIONS_REPO" "stations" || STATIONS_MERGED=$?
 TOTAL_MERGED=$((TOTAL_MERGED + STATIONS_MERGED))
 
+process_repo "$MULTI_REPO" "headchef" || HEADCHEF_MERGED=$?
+TOTAL_MERGED=$((TOTAL_MERGED + HEADCHEF_MERGED))
+
 # ============================================================================
 # PULL MERGED CHANGES
 # ============================================================================
@@ -385,6 +404,7 @@ if [ "$TOTAL_MERGED" -gt 0 ]; then
     trap 'rm -rf "$TEMP_DIR"' EXIT
 
     git clone --depth 1 --quiet "https://github.com/$STATIONS_REPO" "$TEMP_DIR/stations" 2>/dev/null || { H_SAY "Failed to clone makery-stations"; exit 1; }
+    git clone --depth 1 --quiet "https://github.com/$MULTI_REPO" "$TEMP_DIR/multi" 2>/dev/null || { H_SAY "Failed to clone makery-bakery"; exit 1; }
 
     # Update local stations
     mkdir -p "$REPO_ROOT/.makery/kitchen/stations"
@@ -399,6 +419,23 @@ if [ "$TOTAL_MERGED" -gt 0 ]; then
     else
         if cp -r "$TEMP_DIR/stations/stations"/* "$REPO_ROOT/.makery/kitchen/stations/" 2>/dev/null; then
             H_SAY "✓ Updated stations"
+        fi
+    fi
+
+    # Update local headchef
+    mkdir -p "$REPO_ROOT/.makery/kitchen/headchef"
+    if [ "${PARTIAL_REPOS[$MULTI_REPO]}" = "1" ]; then
+        # Partial merge: copy only accepted files
+        while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            rel="${f#makery/kitchen/headchef/}"
+            mkdir -p "$REPO_ROOT/.makery/kitchen/headchef/$(dirname "$rel")"
+            cp "$TEMP_DIR/multi/$f" "$REPO_ROOT/.makery/kitchen/headchef/$rel" 2>/dev/null || true
+        done <<< "${ACCEPTED_FILES_MAP[$MULTI_REPO]}"
+        H_SAY "✓ Updated headchef (partial)"
+    else
+        if cp -r "$TEMP_DIR/multi/makery/kitchen/headchef"/* "$REPO_ROOT/.makery/kitchen/headchef/" 2>/dev/null; then
+            H_SAY "✓ Updated headchef"
         fi
     fi
 else

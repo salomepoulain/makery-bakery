@@ -75,6 +75,7 @@ stash_station() {
         fi
 
         shopt -s nullglob globstar
+        # shellcheck disable=SC2206 # intentional: splitting a glob pattern into matches
         local matches=( $pattern )
         shopt -u nullglob globstar
 
