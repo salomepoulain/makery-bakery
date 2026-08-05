@@ -12,6 +12,7 @@ menu::
 		ITEM "all" 			"Bake everything at once, closes the makery" && \
 		ITEM "station"		"Create a new station to modify according to your wishes" && \
 		ITEM "shady"		"Move this project'\''s contraband into .shadow/ and leave symlinks behind" && \
+		ITEM "shady-specific"	"Pick something else from .gitignore (or type a path) to stash too" && \
 		ITEM "request" 		"Send pull request with your station updates to the registry" && \
 		H_LINE'
 
@@ -69,3 +70,6 @@ station::
 
 shady::
 	@bash .makery/kitchen/headchef/orders/shady.sh
+
+shady-specific::
+	@bash .makery/kitchen/headchef/orders/shady-specific.sh $(s)

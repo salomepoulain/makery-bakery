@@ -149,12 +149,12 @@ H_SAY "+ Stashed ($station_name): $match"
     done < "$contraband"
 
     # Let the station react to going shady (e.g. relocating memory into the stash).
-    if [ -f "$station_dir/cook/contract/shady.sh" ]; then
+    if [ -f "$station_dir/cook/contract/illegal.sh" ]; then
         if [ -f "$station_dir/cook/personality.sh" ]; then
             # shellcheck source=/dev/null
             source "$station_dir/cook/personality.sh"
         fi
-        REPO_ROOT="$REPO_ROOT" SHADOW_DIR="$SHADOW_DIR" bash "$station_dir/cook/contract/shady.sh"
+        REPO_ROOT="$REPO_ROOT" SHADOW_DIR="$SHADOW_DIR" bash "$station_dir/cook/contract/illegal.sh"
     fi
 }
 
