@@ -95,7 +95,7 @@ H_SAY "+ Hidden: $line"
 fi
 
 # --- 4. Auto-stash (if this project has already gone shady) ---
-if [ -L "__STASH__" ]; then
+if [ -L "__stash__" ]; then
 H_SAY "This project is already shady — stashing the new cook's contraband too..."
     bash "$KITCHEN_ROOT/headchef/orders/shady.sh"
 fi
