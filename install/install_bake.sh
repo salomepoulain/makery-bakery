@@ -96,6 +96,11 @@ BAKE_PATH="$BIN_DIR/$BINARY_NAME"
 
 echo "Writing self-contained $BINARY_NAME to $BAKE_PATH ..."
 
+# Build the new binary in a temp file and `mv` it into place at the end (see
+# below). Writing straight to $BAKE_PATH with `>` truncates it in place, which
+# corrupts a currently-running `bake` process still reading itself from that
+# same path when this installer is invoked as bake's own self-upgrade step.
+TMP_BAKE_PATH=$(mktemp)
 {
   cat << '__BAKE_HEAD_EOF__'
 #!/bin/bash
@@ -274,15 +279,15 @@ exit $?
 __BAKE_HEAD_EOF__
   echo "__PAYLOAD__"
   base64 < "$TMP_TARBALL"
-} > "$BAKE_PATH"
+} > "$TMP_BAKE_PATH"
 
 # Substitute the version placeholder with the actual release tag.
 # Avoid sed -i here because BSD sed and GNU sed use different argument forms.
-TMP_BAKE_PATH=$(mktemp)
-sed "s/__BAKE_VERSION__/$RELEASE_TAG/" "$BAKE_PATH" > "$TMP_BAKE_PATH"
-mv "$TMP_BAKE_PATH" "$BAKE_PATH"
-
-chmod +x "$BAKE_PATH"
+TMP_BAKE_PATH2=$(mktemp)
+sed "s/__BAKE_VERSION__/$RELEASE_TAG/" "$TMP_BAKE_PATH" > "$TMP_BAKE_PATH2"
+rm -f "$TMP_BAKE_PATH"
+chmod +x "$TMP_BAKE_PATH2"
+mv "$TMP_BAKE_PATH2" "$BAKE_PATH"
 rm "$TMP_TARBALL" "$TMP_CHECKSUM"
 
 echo "Bake installed to $BAKE_PATH"
