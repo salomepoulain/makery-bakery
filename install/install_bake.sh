@@ -182,7 +182,7 @@ _bake_extract() {
         fi
     fi
     mkdir -p .makery
-    mkdir -p __LOCAL__
+    mkdir -p __trash__
     if [ -n "$src" ]; then
         tar -xzf "$src" -C .makery
         rm -f "$src"
