@@ -84,12 +84,12 @@ done
 H_SAY "Version: $VERSION"
 
 # ============================================================================
-# TAG & PUSH
+# TAG & PUSH (workflow .github/workflows/release.yml will create the release)
 # ============================================================================
 H_SAY "Tagging main with $VERSION..."
 git tag "$VERSION" 2>/dev/null || { H_SAY "Failed to create tag $VERSION"; exit 1; }
 
-H_SAY "Pushing tag..."
+H_SAY "Pushing tag (CI will publish the release)..."
 git push origin "$VERSION" --quiet 2>/dev/null || { H_SAY "Failed to push tag"; exit 1; }
 H_SAY "✓ Tag pushed: https://github.com/$MULTI_REPO/releases/tag/$VERSION"
 
@@ -107,25 +107,9 @@ curl -sL "$TARBALL_URL" -o "$TARBALL_PATH" || { H_SAY "Failed to download tarbal
 TARBALL_SIZE=$(du -h "$TARBALL_PATH" | cut -f1)
 H_SAY "✓ Saved: $TARBALL_PATH ($TARBALL_SIZE)"
 
+# Generate local checksum (release assets are produced by CI)
 H_SAY "Generating checksum..."
 sha256sum "$TARBALL_PATH" | awk '{print $1}' > "$CHECKSUM_PATH"
 H_SAY "✓ Checksum: $(cat "$CHECKSUM_PATH")"
-
-# ============================================================================
-# PUBLISH GITHUB RELEASE
-# ============================================================================
-# No CI workflow publishes this anymore (release.yml was removed) — this
-# script is now the only thing that turns a pushed tag into a Release with
-# the assets bake's self-upgrade downloads (tarball, checksum, installer).
-H_SAY "Publishing GitHub release $VERSION..."
-gh release create "$VERSION" \
-    -R "$MULTI_REPO" \
-    --title "$VERSION" \
-    --generate-notes \
-    "$TARBALL_PATH" \
-    "$CHECKSUM_PATH" \
-    "$REPO_ROOT/install/install_bake.sh" \
-    || { H_SAY "Failed to publish release $VERSION"; exit 1; }
-H_SAY "✓ Release published: https://github.com/$MULTI_REPO/releases/tag/$VERSION"
 
 H_FINISHED
