@@ -406,19 +406,30 @@ if [ "$TOTAL_MERGED" -gt 0 ]; then
     git clone --depth 1 --quiet "https://github.com/$STATIONS_REPO" "$TEMP_DIR/stations" 2>/dev/null || { H_SAY "Failed to clone makery-stations"; exit 1; }
     git clone --depth 1 --quiet "https://github.com/$MULTI_REPO" "$TEMP_DIR/multi" 2>/dev/null || { H_SAY "Failed to clone makery-bakery"; exit 1; }
 
-    # Update local stations
+    # Update local stations — only ones already hired in this project.
+    # Registry stations that aren't hired here are left alone.
     mkdir -p "$REPO_ROOT/.makery/kitchen/stations"
     if [ "${PARTIAL_REPOS[$STATIONS_REPO]}" = "1" ]; then
-        # Partial merge: copy only accepted files
+        # Partial merge: copy only accepted files, for hired stations only
         while IFS= read -r f; do
             [ -z "$f" ] && continue
+            station_name="${f%%/*}"
+            [ -d "$REPO_ROOT/.makery/kitchen/stations/$station_name" ] || continue
             mkdir -p "$REPO_ROOT/.makery/kitchen/stations/$(dirname "$f")"
             cp "$TEMP_DIR/stations/stations/$f" "$REPO_ROOT/.makery/kitchen/stations/$f" 2>/dev/null || true
         done <<< "${ACCEPTED_FILES_MAP[$STATIONS_REPO]}"
-        H_SAY "✓ Updated stations (partial)"
+        H_SAY "✓ Updated stations (partial, hired only)"
     else
-        if cp -r "$TEMP_DIR/stations/stations"/* "$REPO_ROOT/.makery/kitchen/stations/" 2>/dev/null; then
-            H_SAY "✓ Updated stations"
+        updated_any=0
+        for station_src in "$TEMP_DIR/stations/stations"/*/; do
+            station_name=$(basename "$station_src")
+            [ -d "$REPO_ROOT/.makery/kitchen/stations/$station_name" ] || continue
+            rm -rf "$REPO_ROOT/.makery/kitchen/stations/$station_name"
+            cp -r "$station_src" "$REPO_ROOT/.makery/kitchen/stations/$station_name"
+            updated_any=1
+        done
+        if [ "$updated_any" -eq 1 ]; then
+            H_SAY "✓ Updated stations (hired only)"
         fi
     fi
 

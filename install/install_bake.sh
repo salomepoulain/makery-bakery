@@ -68,10 +68,10 @@ TMP_TARBALL=$(mktemp)
 TMP_CHECKSUM=$(mktemp)
 
 echo "Downloading $REPO_URL/releases/download/$RELEASE_TAG/$TARBALL_NAME ..."
-curl -sSL -o "$TMP_TARBALL" "$REPO_URL/releases/download/$RELEASE_TAG/$TARBALL_NAME"
+curl -fsSL -o "$TMP_TARBALL" "$REPO_URL/releases/download/$RELEASE_TAG/$TARBALL_NAME"
 
 echo "Downloading checksum..."
-curl -sSL -o "$TMP_CHECKSUM" "$REPO_URL/releases/download/$RELEASE_TAG/$CHECKSUM_NAME"
+curl -fsSL -o "$TMP_CHECKSUM" "$REPO_URL/releases/download/$RELEASE_TAG/$CHECKSUM_NAME"
 
 echo "Verifying checksum..."
 EXPECTED_HASH=$(awk '{print $1}' "$TMP_CHECKSUM" 2>/dev/null || echo "")
@@ -156,8 +156,8 @@ _bake_download_latest() {
     # Echoes path to verified tarball on success.
     local tmp ck expected actual
     tmp=$(mktemp); ck=$(mktemp)
-    if ! curl -sSL --max-time 15 -o "$tmp" "$_BAKE_REPO_DL/$_LATEST_TAG/makery-bakery-$_LATEST_TAG.tar.gz" \
-        || ! curl -sSL --max-time 15 -o "$ck" "$_BAKE_REPO_DL/$_LATEST_TAG/makery-bakery-$_LATEST_TAG.tar.gz.sha256"; then
+    if ! curl -fsSL --max-time 15 -o "$tmp" "$_BAKE_REPO_DL/$_LATEST_TAG/makery-bakery-$_LATEST_TAG.tar.gz" \
+        || ! curl -fsSL --max-time 15 -o "$ck" "$_BAKE_REPO_DL/$_LATEST_TAG/makery-bakery-$_LATEST_TAG.tar.gz.sha256"; then
         echo "Download failed, falling back to embedded payload." >&2
         rm -f "$tmp" "$ck"; return 1
     fi
@@ -237,6 +237,34 @@ _bake_upgrade_check() {
         curl -sSL "$_BAKE_INSTALLER_URL" | bash
     fi
 }
+
+_bake_update() {
+    # Explicit self-update: always checks GitHub and installs the latest
+    # release, regardless of TTY or BAKE_NO_UPDATE_CHECK. Not project-scoped,
+    # so it runs before the .makery bootstrap below.
+    echo "Checking for the latest bake release..."
+    local _curl_err latest
+    _curl_err=$(mktemp)
+    curl -fsSL "$_BAKE_REPO_API" -o "$_curl_err" 2>/dev/null
+    latest=$(grep '"tag_name"' "$_curl_err" | sed 's/.*"tag_name": "\([^"]*\)".*/\1/')
+    rm -f "$_curl_err"
+    if [ -z "$latest" ]; then
+        echo "Could not reach GitHub to check for updates." >&2
+        return 1
+    fi
+    if [ "$latest" = "$BAKE_VERSION" ]; then
+        echo "bake is already up to date ($BAKE_VERSION)."
+        return 0
+    fi
+    echo "Updating bake: $BAKE_VERSION → $latest"
+    curl -fsSL "$_BAKE_INSTALLER_URL" | bash
+}
+
+# Handle `bake update`: always fetch + install the latest release.
+if [ $# -eq 1 ] && [ "$1" = "update" ]; then
+    _bake_update
+    exit $?
+fi
 
 # Ensure .makery/ exists in the current directory (just-in-time bootstrap).
 [ -d ".makery" ] || _bake_extract
