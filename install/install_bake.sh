@@ -284,10 +284,10 @@ fi
 # Route to make. _empty_station is excluded from single-station auto-routing.
 if [ $# -ge 2 ] && [[ ! "$2" == *=* ]]; then
     _bake_first="$1"; _bake_second="$2"; shift 2
-    make -f .makery/menu.mk "$_bake_first" s="$_bake_second" "$@" 2>/dev/null || \
-        make -f .makery/menu.mk "call" s="$_bake_first" d="$_bake_second" "$@"
+    make --no-print-directory -f .makery/menu.mk "$_bake_first" s="$_bake_second" "$@" 2>/dev/null || \
+        make --no-print-directory -f .makery/menu.mk "call" s="$_bake_first" d="$_bake_second" "$@"
 elif [ $# -eq 1 ] && [[ ! "$1" == *=* ]]; then
-    if ! make -f .makery/menu.mk -n "$1" >/dev/null 2>&1; then
+    if ! make --no-print-directory -f .makery/menu.mk -n "$1" >/dev/null 2>&1; then
         _stations=()
         for _d in .makery/kitchen/stations/*/; do
             [ -d "$_d" ] || continue
@@ -296,12 +296,12 @@ elif [ $# -eq 1 ] && [[ ! "$1" == *=* ]]; then
         done
         if [ ${#_stations[@]} -eq 1 ]; then
             _station=$(basename "${_stations[0]}")
-            exec make -f .makery/menu.mk call s="$_station" d="$1"
+            exec make --no-print-directory -f .makery/menu.mk call s="$_station" d="$1"
         fi
     fi
-    make -f .makery/menu.mk "$@"
+    make --no-print-directory -f .makery/menu.mk "$@"
 else
-    make -f .makery/menu.mk "$@"
+    make --no-print-directory -f .makery/menu.mk "$@"
 fi
 exit $?
 __BAKE_HEAD_EOF__
