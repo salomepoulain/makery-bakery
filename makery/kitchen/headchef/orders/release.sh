@@ -124,7 +124,7 @@ gh release create "$VERSION" \
     --generate-notes \
     "$TARBALL_PATH" \
     "$CHECKSUM_PATH" \
-    "$REPO_ROOT/install/install_bake.sh" \
+    "$TEMP_DIR/multi/install/install_bake.sh" \
     || { H_SAY "Failed to publish release $VERSION"; exit 1; }
 H_SAY "✓ Release published: https://github.com/$MULTI_REPO/releases/tag/$VERSION"
 
