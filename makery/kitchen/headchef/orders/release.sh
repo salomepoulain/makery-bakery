@@ -94,15 +94,13 @@ git push origin "$VERSION" --quiet 2>/dev/null || { H_SAY "Failed to push tag"; 
 H_SAY "✓ Tag pushed: https://github.com/$MULTI_REPO/releases/tag/$VERSION"
 
 # ============================================================================
-# DOWNLOAD TARBALL LOCALLY & GENERATE CHECKSUM
+# GENERATE TARBALL (scoped to makery/) & CHECKSUM
 # ============================================================================
-cd "$REPO_ROOT" || exit 1
-TARBALL_URL="https://github.com/$MULTI_REPO/archive/refs/tags/$VERSION.tar.gz"
 TARBALL_PATH="$ARCHIVE_DIR/makery-bakery-$VERSION.tar.gz"
 CHECKSUM_PATH="$ARCHIVE_DIR/makery-bakery-$VERSION.tar.gz.sha256"
 
-H_SAY "Downloading tarball..."
-curl -sL "$TARBALL_URL" -o "$TARBALL_PATH" || { H_SAY "Failed to download tarball"; exit 1; }
+H_SAY "Generating tarball from makery/..."
+git -C "$TEMP_DIR/multi" archive --format=tar.gz "$VERSION:makery" -o "$TARBALL_PATH" || { H_SAY "Failed to generate tarball"; exit 1; }
 
 TARBALL_SIZE=$(du -h "$TARBALL_PATH" | cut -f1)
 H_SAY "✓ Saved: $TARBALL_PATH ($TARBALL_SIZE)"
