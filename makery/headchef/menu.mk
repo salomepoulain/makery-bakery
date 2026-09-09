@@ -11,7 +11,7 @@ menu::
 		ITEM "station"		"Create a new station to modify according to your wishes" && \
 		ITEM "shady [path]"	"No path: stash this project'\''s contraband into .shadow/. With a path: stash just that too" && \
 		ITEM "request" 		"Send pull request with your station updates to the registry" && \
-		ITEM "all" 			"Bake (delete) the whole kitchen (project) at once, except the stash" && \
+		ITEM "all" 			"Bake the whole kitchen (project) at once, except the stash, closing the makery" && \
 		H_LINE'
 
 inspo::
