@@ -95,9 +95,9 @@ H_SAY "✓ Station '$STATION_NAME' created at .makery/kitchen/stations/$STATION_
 H_SAY ""
 H_SAY "Next steps:"
 H_SAY "  1. Edit cook/personality.sh to customize COOK_NAME, COOK_ICON, COOK_COLOR"
-H_SAY "  2. Edit cook/contract/.prerequisite if your station needs system dependencies"
+H_SAY "  2. Edit workbench/.tools if your station needs system dependencies"
 H_SAY "  3. Edit cook/contract/hired.sh to add setup steps (e.g., create venv)"
-H_SAY "  4. Edit cook/recipes/ to add your station's recipes"
+H_SAY "  4. Edit cook/skills/ to add your station's skills"
 H_SAY "  5. Run 'bake first $STATION_NAME' to hire the station"
 
 H_FINISHED

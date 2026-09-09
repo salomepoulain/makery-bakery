@@ -76,13 +76,14 @@ H_STARTER() {
 }
 
 H_FINISHED() {
-    local rule cols
-    cols=$(_term_cols)
-    rule=$(awk -v n="$cols" 'BEGIN{while(i++<n)printf"☰";print""}')
-    rule_thin=$(awk -v n="$cols" 'BEGIN{while(i++<n)printf"―";print""}')
-    echo -e "${HC_COLOR}${rule_thin}${NC}"
-    echo -e "${HC_COLOR}  BAKE FINISHED${NC}"
-    echo -e "${HC_COLOR}${rule}${NC}"
+    H_LINE
+    # local rule cols
+    # cols=$(_term_cols)
+    # rule=$(awk -v n="$cols" 'BEGIN{while(i++<n)printf"☰";print""}')
+    # rule_thin=$(awk -v n="$cols" 'BEGIN{while(i++<n)printf"―";print""}')
+    # echo -e "${HC_COLOR}${rule_thin}${NC}"
+    # echo -e "${HC_COLOR}  BAKE FINISHED${NC}"
+    # echo -e "${HC_COLOR}${rule}${NC}"
 }
 
 H_LINE() {
