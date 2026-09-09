@@ -7,13 +7,13 @@
 
 set -e
 
-# Validate this script before proceeding
-SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
-if shellcheck -x --exclude=SC1091 "$SCRIPT_PATH" >/dev/null 2>&1; then
-    :
-else
-    echo "Error: shellcheck validation failed"
-    exit 1
+# Validate this script before proceeding (skip if shellcheck isn't installed)
+if command -v shellcheck >/dev/null 2>&1; then
+    SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+    if ! shellcheck -x --exclude=SC1091 "$SCRIPT_PATH" >/dev/null 2>&1; then
+        echo "Error: shellcheck validation failed"
+        exit 1
+    fi
 fi
 
 # shellcheck source=../personality.sh
