@@ -126,11 +126,11 @@ H_SAY "Cloning cloud repos..."
 git clone --depth 1 "$MULTI_REPO" "$TEMP_DIR/multi" 2>/dev/null || { H_SAY "Failed to clone makery-bakery"; exit 1; }
 git clone --depth 1 "$STATIONS_REPO" "$TEMP_DIR/stations" 2>/dev/null || { H_SAY "Failed to clone makery-stations"; exit 1; }
 
-LOCAL_STATIONS="$REPO_ROOT/.makery/kitchen/stations"
+LOCAL_STATIONS="$REPO_ROOT/.makery/stations"
 CLOUD_STATIONS="$TEMP_DIR/stations/stations"
 
-LOCAL_HEADCHEF="$REPO_ROOT/.makery/kitchen/headchef"
-CLOUD_HEADCHEF="$TEMP_DIR/multi/makery/kitchen/headchef"
+LOCAL_HEADCHEF="$REPO_ROOT/.makery/headchef"
+CLOUD_HEADCHEF="$TEMP_DIR/multi/makery/headchef"
 
 
 # ============================================================================
@@ -207,12 +207,12 @@ if show_changes "Comparing headchef" "$LOCAL_HEADCHEF" "$CLOUD_HEADCHEF" true; t
         MODE=$(cat "$WORK_MULTI/.sync-mode"); rm "$WORK_MULTI/.sync-mode"
         cd "$WORK_MULTI" || exit 1
 
-        mkdir -p makery/kitchen/headchef
-        rm -rf makery/kitchen/headchef
-        cp -r "$LOCAL_HEADCHEF" makery/kitchen/headchef
-        git add -A makery/kitchen/headchef
+        mkdir -p makery/headchef
+        rm -rf makery/headchef
+        cp -r "$LOCAL_HEADCHEF" makery/headchef
+        git add -A makery/headchef
 
-        if [ "$(git diff --cached --name-only | grep -v "^makery/kitchen/headchef/" | grep -c .)" -gt 0 ]; then
+        if [ "$(git diff --cached --name-only | grep -v "^makery/headchef/" | grep -c .)" -gt 0 ]; then
             H_SAY "Error: Non-headchef files detected. Aborting."
             exit 1
         fi

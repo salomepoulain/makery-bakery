@@ -1,0 +1,13 @@
+# ============================================================================
+#  LINE COOK STATION: CONTRABAND (shady-stash entries)
+# ============================================================================
+# List files or folders that will get added to the "stash" for going shady.
+# These are the files and folders that get moved into __stash__ and turned
+# into symlinks - not just gitignored, actually stashed and portable.
+#
+# Rule: everything listed here must also be listed in .countertop, so it
+# actually gets gitignored (a stash symlink tracked by git would be broken
+# on every other machine).
+
+# Example:
+# CLAUDE.local.md

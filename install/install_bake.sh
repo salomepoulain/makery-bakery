@@ -196,7 +196,7 @@ _bake_extract() {
         awk '/^__PAYLOAD__$/{flag=1;next}flag' "$0" | base64 -d | tar -xzf - -C .makery
         [ "$_upgraded" -eq 0 ] && echo "Installed .makery/ from embedded payload ($BAKE_VERSION)."
     fi
-    chmod +x .makery/kitchen/headchef/orders/*.sh 2>/dev/null
+    chmod +x .makery/headchef/orders/*.sh 2>/dev/null
     rm -f bake 2>/dev/null
 }
 
@@ -226,7 +226,7 @@ _bake_upgrade_check() {
             mkdir -p .makery
             tar -xzf "$tmp" -C .makery
             rm -f "$tmp"
-            chmod +x .makery/kitchen/headchef/orders/*.sh 2>/dev/null
+            chmod +x .makery/headchef/orders/*.sh 2>/dev/null
             echo "Project .makery/ upgraded to $latest."
         fi
     fi
@@ -289,7 +289,7 @@ if [ $# -ge 2 ] && [[ ! "$2" == *=* ]]; then
 elif [ $# -eq 1 ] && [[ ! "$1" == *=* ]]; then
     if ! make --no-print-directory -f .makery/menu.mk -n "$1" >/dev/null 2>&1; then
         _stations=()
-        for _d in .makery/kitchen/stations/*/; do
+        for _d in .makery/stations/*/; do
             [ -d "$_d" ] || continue
             [ "$(basename "$_d")" = "_empty_station" ] && continue
             _stations+=("$_d")
@@ -298,6 +298,18 @@ elif [ $# -eq 1 ] && [[ ! "$1" == *=* ]]; then
             _station=$(basename "${_stations[0]}")
             exec make --no-print-directory -f .makery/menu.mk call s="$_station" d="$1"
         fi
+        # Genuinely not a real command and no single-station shortcut
+        # applies - report it ourselves instead of letting make ever run
+        # the target for real (which would print its own raw error).
+        if [ -f .makery/headchef/personality.sh ]; then
+            . .makery/headchef/personality.sh
+            H_STARTER "UNKNOWN ORDER"
+            H_SAY "Not a valid argument. Type 'bake' to see the menu."
+            H_LINE
+        else
+            echo "Not a valid argument. Type 'bake' to see the menu." >&2
+        fi
+        exit 1
     fi
     make --no-print-directory -f .makery/menu.mk "$@"
 else

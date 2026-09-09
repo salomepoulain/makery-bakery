@@ -1,0 +1,13 @@
+# ============================================================================
+#  MAKERY-BAKERY KITCHEN: should not serve (.gitignore entries)
+# ============================================================================
+# List files or folders that should never leave the kitchen and get served
+
+.makery/
+.contraband
+.before/
+.after/
+__trash__/
+__stash__
+todo
+TODO

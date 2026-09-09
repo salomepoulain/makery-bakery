@@ -20,7 +20,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 SRC="$REPO_ROOT/makery"
 
-if [ ! -d "$SRC/kitchen" ] || [ ! -f "$SRC/menu.mk" ]; then
+if [ ! -d "$SRC/headchef" ] || [ ! -f "$SRC/menu.mk" ]; then
     echo -e "\033[1;31mError: $SRC is missing or incomplete. Run from a fresh clone of makery-bakery.\033[0m" >&2
     exit 1
 fi
@@ -29,7 +29,10 @@ STARTER "LAYING THE FOUNDATION (Make Setup)..."
 
 # 1. Mirror the makery payload into this project's .makery/
 mkdir -p .makery
-cp -r "$SRC/kitchen" .makery/
+cp -r "$SRC/headchef" .makery/
+cp -r "$SRC/stations" .makery/
+cp "$SRC/.banner" .makery/.banner
+cp "$SRC/.kitchen" .makery/.kitchen
 cp "$SRC/menu.mk" .makery/menu.mk
 
 # 2. Create a Makefile with makery includes
@@ -38,26 +41,26 @@ if [ ! -f "Makefile" ]; then
     cat << 'EOF' > Makefile
 .PHONY: menu first burnt germs fresh all call
 
--include .makery/kitchen/headchef/menu.mk
--include .makery/kitchen/stations/*/menu.mk
+-include .makery/headchef/menu.mk
+-include .makery/stations/*/menu.mk
 
 # Default goal: show the menu
 .DEFAULT_GOAL := menu
 EOF
 else
     # Hook into existing Makefile if necessary
-    if ! grep -q "\.makery/kitchen/headchef/menu\.mk" Makefile; then
+    if ! grep -q "\.makery/headchef/menu\.mk" Makefile; then
         echo "  Adding Makery hooks to existing Makefile..."
         {
             echo -e "\n# --- MAKERY HOOKS ---"
-            echo "-include .makery/kitchen/headchef/menu.mk"
-            echo "-include .makery/kitchen/stations/*/menu.mk"
+            echo "-include .makery/headchef/menu.mk"
+            echo "-include .makery/stations/*/menu.mk"
         } >> Makefile
     fi
 fi
 
 # 3. Set permissions for the Head Chef's orders
-chmod +x .makery/kitchen/headchef/orders/*.sh
+chmod +x .makery/headchef/orders/*.sh
 
 # 4. Safety check: Ensure no local 'bake' file clutters the workspace
 rm -f bake 2>/dev/null

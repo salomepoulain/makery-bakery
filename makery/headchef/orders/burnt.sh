@@ -53,6 +53,31 @@ if [ -f "$STATION_DIR/workbench/.dishsoap" ]; then
     done < "$STATION_DIR/workbench/.dishsoap"
 fi
 
+# 3. Countertop Cleanup
+# Unlike hiring (which protects the countertop), firing gets rid of it -
+# the station's gone, so is everything it claimed. Note: for anything
+# that's a symlink into .shadow/ (e.g. .claude), this only removes the
+# local symlink - the real content stays safe in .shadow/ either way.
+if [ -f "$STATION_DIR/workbench/.countertop" ]; then
+     H_SAY "Clearing the countertop..."
+     while IFS= read -r path_to_clean || [ -n "$path_to_clean" ]; do
+        if [[ -z "$path_to_clean" || "$path_to_clean" == \#* ]]; then continue; fi
+
+        # Expand glob patterns (e.g. *.bak.*) as well as literal paths
+        shopt -s nullglob globstar
+        # shellcheck disable=SC2206 # intentional: splitting a glob pattern into matches
+        matches=( $path_to_clean )
+        shopt -u nullglob globstar
+
+        for match in "${matches[@]}"; do
+            if [ -e "$match" ] || [ -L "$match" ]; then
+                rm -rf "$match"
+H_SAY "- Cleared: $match"
+            fi
+        done
+    done < "$STATION_DIR/workbench/.countertop"
+fi
+
 H_SAY "Demolishing the physical station..."
 rm -rf "$STATION_DIR"
 

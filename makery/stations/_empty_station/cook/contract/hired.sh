@@ -7,11 +7,11 @@
 #
 # Use this script to set up local environments, download dependencies, etc.
 # You can SAY during setup using SAY (shown with the cook's identity):
-#   SAY "Setting up my station and sharpening my knives..."
+#   SAY "Setting up station"
 
 source "$(dirname "${BASH_SOURCE[0]}")/../personality.sh"
 
-# SAY "Setting up my station and sharpening my knives..."
+# SAY "Setting up station"
 
 # Example:
 # if [ ! -d ".venv" ]; then

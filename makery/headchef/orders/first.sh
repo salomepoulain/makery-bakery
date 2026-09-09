@@ -51,7 +51,7 @@ rm -rf "$TMP_DIR"
 H_SAY "The new cook has arrived."
 
 # --- 1. Dependencies ---
-if [ -f "$STATION_DIR/cook/contract/.prerequisite" ]; then
+if [ -f "$STATION_DIR/workbench/.tools" ]; then
 H_SAY "Checking personal tools..."
     while IFS= read -r dep || [ -n "$dep" ]; do
         [[ -z "$dep" || "$dep" == "#"* ]] && continue
@@ -62,7 +62,7 @@ H_SAY "Missing essential tools. Station setup aborted."
         else
 H_SAY "✓ Found: $dep"
         fi
-    done < "$STATION_DIR/cook/contract/.prerequisite"
+    done < "$STATION_DIR/workbench/.tools"
 fi
 
 # --- 2. Pantry (Static files) ---
@@ -82,16 +82,20 @@ fi
 #     done
 # fi
 
-# --- 3. Contraband ---
-if [ -f "$STATION_DIR/workbench/.contraband" ] && [ -f ".gitignore" ]; then
-H_SAY "Hiding contraband..."
+# --- 3. Countertop (.gitignore entries) ---
+# .countertop is the sole source of truth for .gitignore - station authors
+# write it by hand, including duplicating in anything from .contraband or
+# .dishsoap that also needs gitignoring. No automatic union: writing it
+# out explicitly is what makes a station author actually think about it.
+if [ -f "$STATION_DIR/workbench/.countertop" ] && [ -f ".gitignore" ]; then
+H_SAY "Hiding countertop..."
     while IFS= read -r line || [ -n "$line" ]; do
         [[ -z "$line" || "$line" == "#"* ]] && continue
         if ! grep -Fxq "$line" .gitignore; then
             echo "$line" >> .gitignore
 H_SAY "+ Hidden: $line"
         fi
-    done < "$STATION_DIR/workbench/.contraband"
+    done < "$STATION_DIR/workbench/.countertop"
 fi
 
 # --- 4. Auto-stash (if this project has already gone shady) ---
@@ -101,13 +105,45 @@ H_SAY "This project is already shady — stashing the new cook's contraband too.
 fi
 
 # --- 5. Setup Script ---
+# The countertop is untouchable: whatever this station's .countertop
+# already claims locally (including a dangling symlink - the name is
+# still claimed even if its target isn't there yet) gets snapshotted
+# aside before hired.sh runs, and put back exactly as it was afterward -
+# no matter what hired.sh does. hired.sh never needs to check for this
+# itself.
 if [ -f "$STATION_DIR/cook/contract/hired.sh" ]; then
+    COUNTERTOP_BACKUP=$(mktemp -d)
+    COUNTERTOP_PROTECTED=()
+
+    if [ -f "$STATION_DIR/workbench/.countertop" ]; then
+        while IFS= read -r path || [ -n "$path" ]; do
+            [[ -z "$path" || "$path" == "#"* ]] && continue
+
+            # A name already claims the spot even if it's a dangling
+            # symlink (e.g. .shadow/ hasn't synced in yet) - -e alone
+            # would miss that, since it follows the link and fails on
+            # a broken target. -L catches it either way.
+            [ -e "$path" ] || [ -L "$path" ] || continue
+
+            mkdir -p "$COUNTERTOP_BACKUP/$(dirname "$path")"
+            mv "$path" "$COUNTERTOP_BACKUP/$path"
+            COUNTERTOP_PROTECTED+=("$path")
+        done < "$STATION_DIR/workbench/.countertop"
+    fi
+
     if [ -f "$STATION_DIR/cook/personality.sh" ]; then
         # shellcheck source=/dev/null
         source "$STATION_DIR/cook/personality.sh"
     fi
 
     bash "$STATION_DIR/cook/contract/hired.sh"
+
+    for path in "${COUNTERTOP_PROTECTED[@]}"; do
+        rm -rf "$path"
+        mkdir -p "$(dirname "$path")"
+        mv "$COUNTERTOP_BACKUP/$path" "$path"
+    done
+    rm -rf "$COUNTERTOP_BACKUP"
 fi
 
 H_FINISHED

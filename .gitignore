@@ -44,3 +44,7 @@ temp/
 
 *.txt
 *.tar.*
+CLAUDE.local.md
+CLAUDE.local.md.bak.*
+todo
+.todo

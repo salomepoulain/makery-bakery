@@ -408,24 +408,24 @@ if [ "$TOTAL_MERGED" -gt 0 ]; then
 
     # Update local stations — only ones already hired in this project.
     # Registry stations that aren't hired here are left alone.
-    mkdir -p "$REPO_ROOT/.makery/kitchen/stations"
+    mkdir -p "$REPO_ROOT/.makery/stations"
     if [ "${PARTIAL_REPOS[$STATIONS_REPO]}" = "1" ]; then
         # Partial merge: copy only accepted files, for hired stations only
         while IFS= read -r f; do
             [ -z "$f" ] && continue
             station_name="${f%%/*}"
-            [ -d "$REPO_ROOT/.makery/kitchen/stations/$station_name" ] || continue
-            mkdir -p "$REPO_ROOT/.makery/kitchen/stations/$(dirname "$f")"
-            cp "$TEMP_DIR/stations/stations/$f" "$REPO_ROOT/.makery/kitchen/stations/$f" 2>/dev/null || true
+            [ -d "$REPO_ROOT/.makery/stations/$station_name" ] || continue
+            mkdir -p "$REPO_ROOT/.makery/stations/$(dirname "$f")"
+            cp "$TEMP_DIR/stations/stations/$f" "$REPO_ROOT/.makery/stations/$f" 2>/dev/null || true
         done <<< "${ACCEPTED_FILES_MAP[$STATIONS_REPO]}"
         H_SAY "✓ Updated stations (partial, hired only)"
     else
         updated_any=0
         for station_src in "$TEMP_DIR/stations/stations"/*/; do
             station_name=$(basename "$station_src")
-            [ -d "$REPO_ROOT/.makery/kitchen/stations/$station_name" ] || continue
-            rm -rf "$REPO_ROOT/.makery/kitchen/stations/$station_name"
-            cp -r "$station_src" "$REPO_ROOT/.makery/kitchen/stations/$station_name"
+            [ -d "$REPO_ROOT/.makery/stations/$station_name" ] || continue
+            rm -rf "$REPO_ROOT/.makery/stations/$station_name"
+            cp -r "$station_src" "$REPO_ROOT/.makery/stations/$station_name"
             updated_any=1
         done
         if [ "$updated_any" -eq 1 ]; then
@@ -434,18 +434,18 @@ if [ "$TOTAL_MERGED" -gt 0 ]; then
     fi
 
     # Update local headchef
-    mkdir -p "$REPO_ROOT/.makery/kitchen/headchef"
+    mkdir -p "$REPO_ROOT/.makery/headchef"
     if [ "${PARTIAL_REPOS[$MULTI_REPO]}" = "1" ]; then
         # Partial merge: copy only accepted files
         while IFS= read -r f; do
             [ -z "$f" ] && continue
-            rel="${f#makery/kitchen/headchef/}"
-            mkdir -p "$REPO_ROOT/.makery/kitchen/headchef/$(dirname "$rel")"
-            cp "$TEMP_DIR/multi/$f" "$REPO_ROOT/.makery/kitchen/headchef/$rel" 2>/dev/null || true
+            rel="${f#makery/headchef/}"
+            mkdir -p "$REPO_ROOT/.makery/headchef/$(dirname "$rel")"
+            cp "$TEMP_DIR/multi/$f" "$REPO_ROOT/.makery/headchef/$rel" 2>/dev/null || true
         done <<< "${ACCEPTED_FILES_MAP[$MULTI_REPO]}"
         H_SAY "✓ Updated headchef (partial)"
     else
-        if cp -r "$TEMP_DIR/multi/makery/kitchen/headchef"/* "$REPO_ROOT/.makery/kitchen/headchef/" 2>/dev/null; then
+        if cp -r "$TEMP_DIR/multi/makery/headchef"/* "$REPO_ROOT/.makery/headchef/" 2>/dev/null; then
             H_SAY "✓ Updated headchef"
         fi
     fi

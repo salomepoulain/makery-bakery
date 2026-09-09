@@ -37,7 +37,7 @@ REPO_ROOT=$(find_project_root) || {
     exit 1
 }
 
-STATION_DIR="$REPO_ROOT/.makery/kitchen/stations/$STATION_NAME"
+STATION_DIR="$REPO_ROOT/.makery/stations/$STATION_NAME"
 
 # Check station doesn't already exist
 if [[ -d "$STATION_DIR" ]]; then
@@ -48,7 +48,7 @@ fi
 H_SAY "Fetching template from salomepoulain/makery-bakery..."
 
 # Use GitHub API to get the file tree structure
-TREE_DATA=$(gh api repos/salomepoulain/makery-bakery/git/trees/HEAD?recursive=1 --jq '.tree[] | select(.path | startswith("makery/kitchen/stations/_empty_station/"))' 2>/dev/null) || {
+TREE_DATA=$(gh api repos/salomepoulain/makery-bakery/git/trees/HEAD?recursive=1 --jq '.tree[] | select(.path | startswith("makery/stations/_empty_station/"))' 2>/dev/null) || {
     H_SAY "Error: failed to fetch template tree from GitHub"
     H_SAY "Make sure you're authenticated: gh auth login"
     exit 1
@@ -67,8 +67,8 @@ while IFS= read -r line; do
     FILE_PATH=$(echo "$line" | jq -r '.path')
     FILE_TYPE=$(echo "$line" | jq -r '.type')
 
-    # Strip "makery/kitchen/stations/_empty_station/" prefix
-    RELATIVE_PATH="${FILE_PATH#makery/kitchen/stations/_empty_station/}"
+    # Strip "makery/stations/_empty_station/" prefix
+    RELATIVE_PATH="${FILE_PATH#makery/stations/_empty_station/}"
 
     if [[ "$FILE_TYPE" == "blob" ]]; then
         TARGET_PATH="$STATION_DIR/$RELATIVE_PATH"
@@ -91,13 +91,13 @@ done <<< "$TREE_DATA"
 # Make scripts executable
 find "$STATION_DIR" -name "*.sh" -type f -exec chmod +x {} \;
 
-H_SAY "✓ Station '$STATION_NAME' created at .makery/kitchen/stations/$STATION_NAME"
+H_SAY "✓ Station '$STATION_NAME' created at .makery/stations/$STATION_NAME"
 H_SAY ""
 H_SAY "Next steps:"
 H_SAY "  1. Edit cook/personality.sh to customize COOK_NAME, COOK_ICON, COOK_COLOR"
-H_SAY "  2. Edit cook/contract/.prerequisite if your station needs system dependencies"
+H_SAY "  2. Edit workbench/.tools if your station needs system dependencies"
 H_SAY "  3. Edit cook/contract/hired.sh to add setup steps (e.g., create venv)"
-H_SAY "  4. Edit cook/recipes/ to add your station's recipes"
+H_SAY "  4. Edit cook/skills/ to add your station's skills"
 H_SAY "  5. Run 'bake first $STATION_NAME' to hire the station"
 
 H_FINISHED
