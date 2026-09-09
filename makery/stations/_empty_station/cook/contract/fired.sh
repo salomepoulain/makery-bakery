@@ -12,7 +12,7 @@
 
 source "$(dirname "${BASH_SOURCE[0]}")/../personality.sh"
 
-# SAY "Setting up my station and sharpening my knives..."
+# SAY "Cleaning up my station"
 
 # Example:
 # jupyter kernelspec uninstall -f my-kernel

@@ -1,5 +1,5 @@
 # station-name/menu.mk
-# Standalone Makefile — works with: cd .makery/stations/<name> && make <recipe>
+# Standalone Makefile. Works with: cd .makery/kitchen/stations/<name> && make <recipe>
 
 # Recipes defined below are run via: bake call s=<station> d=<recipe>
 # (first, fresh, burnt are managed by the Head Chef)
@@ -14,6 +14,5 @@ menu::
 
 # Add your recipes below:
 
-# models: Switch between Anthropic and OpenRouter providers
 example:
-	@bash $(STATION_DIR)cook/recipes/example.sh
+	@bash $(STATION_DIR)cook/skills/example.sh
