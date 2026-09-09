@@ -1,0 +1,1503 @@
+{
+    "jupyter.askForKernelRestart": false,
+    // "security.workspace.trust.untrustedFiles": "true",
+
+    "editor.guides.bracketPairs": "active",
+
+    "editor.bracketPairColorization.enabled": true,
+
+    "cmake.debugConfig": {
+        "stopAtEntry": false,
+        "MIMode": "lldb",
+        "miDebuggerPath": "/Users/dubbelda/.vscode/extensions/ms-vscode.cpptools-1.22.11-darwin-x64/debugAdapters/lldb-mi/bin/lldb-mi",
+        "logging": {
+                "trace": true,
+                "engineLogging": true,
+                "traceResponse": true
+        }
+    },
+    "cmake.options.statusBarVisibility": "visible",
+    "cmake.pinnedCommands": [
+        "workbench.action.tasks.configureTaskRunner",
+        "workbench.action.tasks.runTask"
+    ],
+    "cmake.showConfigureWithDebuggerNotification": false,
+    "terminal.integrated.commandsToSkipShell": [
+        "matlab.interrupt"
+    ],
+    "workbench.editorAssociations": {
+        "*.copilotmd": "vscode.markdown.preview.editor",
+        "*.jar": "default",
+        "*.mp4": "vscode.videoPreview"
+    },
+
+    "window.autoDetectHighContrast": false,
+    "workbench.preferredHighContrastLightColorTheme": "Dark Modern",
+    // "font-profile.profile": "default",
+    // "font-profile.profiles": { 
+    //     "default": {
+    //         "editor.fontFamily": "Fira Code",
+    //         "editor.fontLigatures": true,
+    //         "editor.fontSize": 12,
+    //         "editor.fontWeight": "normal",
+    //         "editor.fontVariations": true 
+    //     }
+    // },
+    
+    // --- TERMINAL SETTINGS ---
+    // This font is ONLY for the INTEGRATED TERMINAL panel.
+    "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono",
+    // "terminal.integrated.fontFamily": "",
+    "terminal.integrated.lineHeight": 1.2,
+    // --- OS-SPECIFIC SETTINGS (Correctly configured!) ---
+    "[windows]": {
+        "terminal.external.windowsExec": "wt.exe",
+        "terminal.integrated.defaultProfile.windows": "Ubuntu (WSL)"
+    },
+
+
+    "explorer.sortOrder": "type",
+    // "editor.fontFamily": "JetBrains Mono
+    "editor.fontFamily": "fira code",
+    // "editor.codeLensFontFamily": "JetBrainsMono Nerd Font Mono",
+    // "editor.fontLigatures": true,
+    "editor.showFoldingControls": "never",
+    "editor.unfoldOnClickAfterEndOfLine": false,
+    "editor.foldingImportsByDefault": false,
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "editor.cursorBlinking": "solid",
+    "github.copilot.enable": {
+        "*": false,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false
+    },
+    "scm.diffDecorations": "none",
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "github.copilot.advanced": {},
+    // "editor.inlineSuggest.fontFamily": "JetBrainsMono Nerd Font Mono",
+    "editor.inlineSuggest.fontFamily": "Fira Code",
+    "editor.fontLigatures": true,
+    // "debug.console.fontFamily": "JetBrainsMono Nerd Font Mono",
+    "debug.console.fontFamily": "Fira Code",
+    "terminal.integrated.cursorStyle": "line",
+    "terminal.integrated.cursorStyleInactive": "line",
+    // "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font Mono",
+    "explorer.confirmDelete": false,
+    "explorer.decorations.badges": false,
+    "git.blame.editorDecoration.enabled": false,
+    "github.copilot.nextEditSuggestions.enabled": false,
+    "[python]": {
+        "editor.defaultFormatter": null,
+        "editor.formatOnSave": false,
+        "diffEditor.ignoreTrimWhitespace": false 
+
+    },
+        // Prettier
+    "prettier.enable": true,
+    "debug.showBreakpointsInOverviewRuler": false,
+    "debug.showInlineBreakpointCandidates": false,
+  
+    "editor.tokenColorCustomizations": {
+
+
+        "textMateRules": [
+            // {
+            //     "name": "Python self parameter",
+            //     "scope": "variable.language.special.self.python",
+            //     "settings": {
+            //         "foreground": "#E5C07B", // Choose your color
+            //     }
+            // },
+        
+            // {
+            // "scope": "string.quoted.python",
+            //     "settings": {
+            //         "foreground": "#D7BA7D" // Muted yellow/gold for general strings
+            //     }
+            // },
+            // {
+            //     "scope": "docstring.heading.placeholder",
+            //     "settings": {
+            //         "fontStyle": "bold underline",
+            //         "foreground": "#569cd6"
+            //     }
+            // }, 
+            // {
+            //     "scope": "docstring.heading",
+            //     "settings": {
+            //         // "foreground": "#98c379"
+            //         "foreground": "#D7BA7D"
+            //     }
+            // },
+            // {
+            //     "scope": "docstring.variable",
+            //     "settings": {
+            //         // "foreground": "#56b6c2"
+            //         "foreground": "#C99C6E"
+            //     }
+            // },
+            // {
+            //     "scope": ".type",
+            //     "settings": {
+            //         "foreground": "#f5fffe"
+            //     }
+            // },
+
+         // Rule to make all docstrings yellow
+            // 1. General Rule: Make ALL docstring content yellow by default.
+            // This targets the broadest scope for docstrings provided by the extension.
+
+            {   
+                "name": "docstring_general",
+                "scope": [
+                    "string.quoted.docstring", 
+                ],
+                "settings":{
+                    "fontStyle": "italic",
+                }
+            },
+
+            {   
+                "name": "docstring_text",
+                "scope": [
+                    "string.quoted.docstring.multi.python", 
+                ],
+                "settings":{
+                    // "foreground": "#D7BA7D"
+                    "foreground": "#E06C75"
+                }
+            },
+
+            {   
+                "name": "variabele",
+                "scope": [
+                    "docstring.variable.placeholder", 
+                    "docstring.snippet.placeholder.python"
+                    // "punctuation.definition.tag.end"
+                ],
+                "settings":{
+                    "foreground": "#D19A66",
+                    "fontStyle": ""
+                    // "fontStyle": "underline"
+                }
+            },
+            {   
+                "name": "variabele_end",
+                "scope": [
+                    "docstring.variable.end"
+                ],
+                "settings":{
+                    // "foreground": "#56B6C2",
+                    "foreground": "#ABB2BF",
+                    "fontStyle": ""
+                }
+            },
+            {
+                "name": "heading",
+                "scope": [
+                    "docstring.heading.placeholder.python",
+                    "docstring.heading.end"
+                ],
+                "settings": {
+                    "foreground": "#C678DD",
+                    // "fontStyle": ""
+                }
+            },
+            
+            // 2. Specific Rule: Override for docstring TYPES to be gray.
+            // This rule is more specific and will apply to types, overriding the yellow.
+            {
+                "name": "normal string",
+                "scope": "string.quoted.single.python", // Specific scope for types in docstrings
+                "settings": {
+                    // "foreground": "#D7BA7D" // Gray
+                }
+            },
+
+            // (Keep your other custom rules here, e.g., for general string.quoted if needed)
+            // Example for general strings, distinct from docstrings:
+            // {
+            //     "name": "General Quoted Strings",
+            //     "scope": [
+            //         "string.quoted",
+            //         "string.quoted.single",
+            //         "string.quoted.double"
+            //     ],
+            //     "settings": {
+            //         "foreground": "#D7BA7D" // Muted yellow/gold for general strings
+            //     }
+            // },
+
+            {
+                "name": "string.quoted.orange",
+                "scope": "string.quoted.orange",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#CA7553"
+                }
+            },
+            {
+                "name": "constant.character.lightblue",
+                "scope": "constant.character.lightblue",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#3FAEF3DE"
+                }
+            },
+            {
+                "name": "character.darkyellow",
+                "scope": "character.darkyellow",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#CC8720"
+                }
+            },
+            {
+                "name": "comment.green",
+                "scope": "comment.green",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#3C802D"
+                }
+            },
+            {
+                "name": "comment.lightblue",
+                "scope": "comment.lightblue",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#7EC5C5"
+                }
+            },
+            {
+                "name": "comment.pink",
+                "scope": "comment.pink",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#C57D9E"
+                }
+            },
+            {
+                "name": "comment.grayblue",
+                "scope": "comment.grayblue",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#7A8FB7"
+                }
+            },
+            {
+                "name": "comment.lightgreen",
+                "scope": "comment.lightgreen",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#25B815"
+                }
+            },
+            {
+                "name": "keyword.purple",
+                "scope": "keyword.purple",
+                "settings": {
+                    "fontStyle": "bold",
+                    "foreground": "#D95EF1F8"
+                }
+            },
+            {
+                "name": "keyword.white",
+                "scope": "keyword.white",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#BBBBBB"
+                }
+            },
+            {
+                "name": "variable.parameter.purple",
+                "scope": "variable.parameter.purple",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#A66BDD"
+                }
+            },
+            {
+                "name": "support.function.yellow",
+                "scope": "support.function.yellow",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#C3F709"
+                }
+            },
+            {
+                "name": "keyword.darkyellow",
+                "scope": "keyword.darkyellow",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#939317"
+                }
+            },
+            {
+                "name": "character.paper",
+                "scope": "character.paper",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#00b8e5"
+                }
+            },
+            {
+                "name": "character.italic",
+                "scope": "character.italic",
+                "settings": {
+                    "fontStyle": "italic bold",
+                    "foreground": "#E37FF7"
+                }
+            },
+            {
+                "name": "character.type",
+                "scope": "character.type",
+                "settings": {
+                    "fontStyle": "bold",
+                    "foreground": "#AF3FAF"
+                }
+            },
+            {
+                "name": "character.atom",
+                "scope": "character.atom",
+                "settings": {
+                    "fontStyle": "bold",
+                    "foreground": "#03CE7D"
+                }
+            },
+            {
+                "name": "character.ligand",
+                "scope": "character.ligand",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#80F8B0E0"
+                }
+            },
+            {
+                "name": "character.title",
+                "scope": "character.title",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#39A3E9"
+                }
+            },
+            {
+                "name": "protein.helix",
+                "scope": "protein.helix",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#827AF0"
+                }
+            },
+            {
+                "name": "protein.sheet",
+                "scope": "protein.sheet",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#5EF0BF"
+                }
+            },
+            {
+                "name": "protein.turn",
+                "scope": "protein.turn",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#D8D5F8"
+                }
+            },
+            {
+                "name": "protein.site",
+                "scope": "protein.site",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#195E79"
+                }
+            },
+            {
+                "name": "protein.position",
+                "scope": "protein.position",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#87B860"
+                }
+            },
+            {
+                "name": "water",
+                "scope": "water",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#FD0536"
+                }
+            },
+            {
+                "name": "ssbond",
+                "scope": "ssbond",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#E68F0E"
+                }
+            },
+            {
+                "name": "aaA",
+                "scope": "aaA",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#EB0E84"
+                }
+            },
+            {
+                "name": "aaR",
+                "scope": "aaR",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#F71C1C"
+                }
+            },
+            {
+                "name": "aaN",
+                "scope": "aaN",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#CF4A15"
+                }
+            },
+            {
+                "name": "aaD",
+                "scope": "aaD",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#EEA033"
+                }
+            },
+            {
+                "name": "aaC",
+                "scope": "aaC",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#FFFF00"
+                }
+            },
+            {
+                "name": "aaQ",
+                "scope": "aaQ",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#BBFF00"
+                }
+            },
+            {
+                "name": "aaE",
+                "scope": "aaE",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#77FF00"
+                }
+            },
+            {
+                "name": "aaG",
+                "scope": "aaG",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#00FF00"
+                }
+            },
+            {
+                "name": "aaH",
+                "scope": "aaH",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#00FF99"
+                }
+            },
+            {
+                "name": "aaI",
+                "scope": "aaI",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#00FFCC"
+                }
+            },
+            {
+                "name": "aaL",
+                "scope": "aaL",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#00FFFF"
+                }
+            },
+            {
+                "name": "aaK",
+                "scope": "aaK",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#136DE4"
+                }
+            },
+            {
+                "name": "aaM",
+                "scope": "aaM",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#5599FF"
+                }
+            },
+            {
+                "name": "aaF",
+                "scope": "aaF",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#4040D8"
+                }
+            },
+            {
+                "name": "aaP",
+                "scope": "aaP",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#B94FFF"
+                }
+            },
+            {
+                "name": "aaS",
+                "scope": "aaS",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#CC00FF"
+                }
+            },
+            {
+                "name": "aaT",
+                "scope": "aaT",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#FF3EFF"
+                }
+            },
+            {
+                "name": "aaW",
+                "scope": "aaW",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#FF00FF"
+                }
+            },
+            {
+                "name": "aaY",
+                "scope": "aaY",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#FFB3FF"
+                }
+            },
+            {
+                "name": "aaV",
+                "scope": "aaV",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#AAFFEE"
+                }
+            },
+            {
+                "name": "aaB",
+                "scope": "aaB",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#FF0000"
+                }
+            },
+            {
+                "name": "aaX",
+                "scope": "aaX",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#9400D3"
+                }
+            },
+            {
+                "name": "aaZ",
+                "scope": "aaZ",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#FF8C00"
+                }
+            },
+            {
+                "name": "keyword.control.directive.gjf",
+                "scope": "keyword.control.directive.gjf",
+                "settings": {
+                    "fontStyle": "bold",
+                    "foreground": "#FF6B35"
+                }
+            },
+            {
+                "name": "keyword.control.gjf",
+                "scope": "keyword.control.gjf",
+                "settings": {
+                    "fontStyle": "bold",
+                    "foreground": "#FF6B35"
+                }
+            },
+            {
+                "name": "support.function.method.gjf",
+                "scope": "support.function.method.gjf",
+                "settings": {
+                    "fontStyle": "bold",
+                    "foreground": "#4FC3F7"
+                }
+            },
+            {
+                "name": "constant.character.basis.gjf",
+                "scope": "constant.character.basis.gjf",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#81C784"
+                }
+            },
+            {
+                "name": "entity.name.function.keyword.gjf",
+                "scope": "entity.name.function.keyword.gjf",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#FFB74D"
+                }
+            },
+            {
+                "name": "support.type.solvation.gjf",
+                "scope": "support.type.solvation.gjf",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#BA68C8"
+                }
+            },
+            {
+                "name": "string.quoted.single.solvent.gjf",
+                "scope": "string.quoted.single.solvent.gjf",
+                "settings": {
+                    "fontStyle": "italic",
+                    "foreground": "#F06292"
+                }
+            },
+            {
+                "name": "constant.character.dispersion.gjf",
+                "scope": "constant.character.dispersion.gjf",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#A1887F"
+                }
+            },
+            {
+                "name": "constant.numeric.parameter.gjf",
+                "scope": "constant.numeric.parameter.gjf",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#64B5F6"
+                }
+            },
+            {
+                "name": "string.quoted.orange.title.gjf",
+                "scope": "string.quoted.orange.title.gjf",
+                "settings": {
+                    "fontStyle": "italic",
+                    "foreground": "#FFA726"
+                }
+            },
+            {
+                "name": "constant.character.charge.gjf",
+                "scope": "constant.character.charge.gjf",
+                "settings": {
+                    "fontStyle": "bold",
+                    "foreground": "#E57373"
+                }
+            },
+            {
+                "name": "entity.name.type.atom.gjf",
+                "scope": "entity.name.type.atom.gjf",
+                "settings": {
+                    "fontStyle": "bold",
+                    "foreground": "#66BB6A"
+                }
+            },
+            {
+                "name": "constant.numeric.coordinate.gjf",
+                "scope": "constant.numeric.coordinate.gjf",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#90CAF9"
+                }
+            },
+            {
+                "name": "entity.name.tag.atom.gjf",
+                "scope": "entity.name.tag.atom.gjf",
+                "settings": {
+                    "fontStyle": "bold",
+                    "foreground": "#4DB6AC"
+                }
+            },
+            {
+                "name": "constant.numeric.gjf",
+                "scope": "constant.numeric.gjf",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#B39DDB"
+                }
+            },
+            {
+                "name": "string.unquoted.filename.gjf",
+                "scope": "string.unquoted.filename.gjf",
+                "settings": {
+                    "fontStyle": "italic",
+                    "foreground": "#FFCC02"
+                }
+            },
+            {
+                "name": "comment.line.blank.gjf",
+                "scope": "comment.line.blank.gjf",
+                "settings": {
+                    "fontStyle": "",
+                    "foreground": "#757575"
+                }
+            }
+        ]
+    },
+
+
+    // Removes breakpoint/debug margin
+    "editor.glyphMargin": false,
+    "editor.folding": true,
+    
+    // TypeScript/JavaScript
+    "typescript.suggest.enabled": false,
+    "javascript.suggest.enabled": false,
+    
+
+
+
+    "snyk.advanced.cliPath": "C:\\Users\\Saloc\\AppData\\Local\\snyk\\vscode-cli\\snyk-win.exe",
+    "snyk.folderConfigs": [
+        {
+            "folderPath": "c:\\iCloudDrive\\Documents\\templates\\ultimate_python_project",
+            "baseBranch": ""
+        }
+    ],
+    "snyk.trustedFolders": [
+        "c:\\iCloudDrive\\Documents\\anders\\geld\\crypto\\copy_trade2"
+    ],
+    "autoDocstring.startOnNewLine": true,
+    "autoDocstring.includeExtendedSummary": true,
+    "autoDocstring.includeName": true,
+    "ai-docstring.startOnNewLine": true,
+    "docwriter.progress.trackTypes": true,
+    "docwriter.progress.trackClasses": true,
+    "ai-docstring.includeExtendedSummary": true,
+    "ai-docstring.includeName": true,
+    "enableTelemetry": false,
+    "containers.containerClient": "com.microsoft.visualstudio.containers.docker",
+    "sourcery.codeLens": false,
+    "prettier.tabWidth": 4,
+    "chat.instructionsFilesLocations": {
+        ".github/instructions": true,
+        "C:\\Users\\Saloc\\AppData\\Local\\Temp\\postman-collections-post-response.instructions.md": true,
+        "C:\\Users\\Saloc\\AppData\\Local\\Temp\\postman-collections-pre-request.instructions.md": true,
+        "C:\\Users\\Saloc\\AppData\\Local\\Temp\\postman-folder-post-response.instructions.md": true,
+        "C:\\Users\\Saloc\\AppData\\Local\\Temp\\postman-folder-pre-request.instructions.md": true,
+        "C:\\Users\\Saloc\\AppData\\Local\\Temp\\postman-http-request-post-response.instructions.md": true,
+        "C:\\Users\\Saloc\\AppData\\Local\\Temp\\postman-http-request-pre-request.instructions.md": true,
+        "/var/folders/1r/pgxzj8b13d98r7y7z49g3dp40000gn/T/postman-collections-post-response.instructions.md": true,
+        "/var/folders/1r/pgxzj8b13d98r7y7z49g3dp40000gn/T/postman-collections-pre-request.instructions.md": true,
+        "/var/folders/1r/pgxzj8b13d98r7y7z49g3dp40000gn/T/postman-folder-post-response.instructions.md": true,
+        "/var/folders/1r/pgxzj8b13d98r7y7z49g3dp40000gn/T/postman-folder-pre-request.instructions.md": true,
+        "/var/folders/1r/pgxzj8b13d98r7y7z49g3dp40000gn/T/postman-http-request-post-response.instructions.md": true,
+        "/var/folders/1r/pgxzj8b13d98r7y7z49g3dp40000gn/T/postman-http-request-pre-request.instructions.md": true,
+        "/tmp/postman-collections-post-response.instructions.md": true,
+        "/tmp/postman-collections-pre-request.instructions.md": true,
+        "/tmp/postman-folder-post-response.instructions.md": true,
+        "/tmp/postman-folder-pre-request.instructions.md": true,
+        "/tmp/postman-http-request-post-response.instructions.md": true,
+        "/tmp/postman-http-request-pre-request.instructions.md": true
+    },
+    "git.autofetch": true,
+    "git.decorations.enabled": false,
+    "explorer.compactFolders": false,
+    "explorer.decorations.colors": false,
+    "chatgpt-docstrings.baseUrl": "https://openrouter.ai/api/v1",
+    "chatgpt-docstrings.aiModel": "gpt-4o",
+    "chatgpt-docstrings.aiModelCustom": "anthropic/claude-sonnet-4",
+    "chatgpt-docstrings.promptPattern": "Generate a {docstring_style}-style docstring for the following Python {entity} code.\nBegin with exactly one one-line summary. Do not add any extra description before Parameters. Use section headers Parameters, Returns, Raises, and Notes with NumPy underlines. Wrap all lines at 72 characters. In Parameters, include only if arguments exist and format as name : type_hint followed by a short description. In Returns, omit if return type is None, otherwise format as type_hint followed by a short description. In Raises, include only if relevant and list each exception with a short description. In Notes, add only important non-obvious info as bullet points, using '-' and not bullets, with concrete examples if needed.\n{code}",
+    "chatgpt-docstrings.codeAnalyzer": "ast",
+
+    "workbench.editor.tabSizing": "fixed",
+    "errorLens.messageBackgroundMode" : "message",
+    "errorLens.enabledDiagnosticLevels": [
+        "error",
+        "info",
+        "hint"
+    ],
+    "errorLens.messageMaxChars": 1000, 
+    "errorLens.fontFamily": "Cascadia Code",  
+    "errorLens.alignMessage": {
+        "start": 50,
+        "end": 0,
+        "minimumMargin": 4,
+        "padding": [
+            0,
+            0
+        ],
+        "useFixedPosition": true
+    },
+    "errorLens.messageTemplate": "$source | $message",
+    // "errorLens.messageTemplate": "$severity $message",
+    // "errorLens.severityText": [
+    //     "WARNING",
+    //     "ERROR",
+    //     "INFO",
+    //     "HINT",
+    // ],
+    "errorLens.padding": "0px 0.5ch",
+    "errorLens.borderRadius": "0.2em",
+    "errorLens.gutterIconSet": "circle",
+    "errorLens.gutterIconSize": "120%",
+    "errorLens.gutterIconsEnabled": false,
+    // "errorLens.gutterIconsFollowCursorOverride": true,
+    "errorLens.followCursor"  : "allLines",
+    "errorLens.fontWeight": "normal",
+    "errorLens.margin" : "1ch",
+    // "errorLens.alignMessage": {
+    //     "start": 0,                
+    //     "end": 0,
+    //     "padding": [0, 0.8],dsf
+    // },
+    "errorLens.enabled": true,
+    "errorLens.delayMode" : "new",
+    "errorLens.delay": 1,
+    "errorLens.fontStyleItalic": false,
+        // "errorLens.fontSize": "-2px",
+    "editor.scrollbar.ignoreHorizontalScrollbarInContentHeight": true,
+    "errorLens.editorHoverPartsEnabled": {
+        "messageEnabled": true,
+        "sourceCodeEnabled": true
+    },
+
+    // MARK: color
+    "workbench.reduceMotion": "on",
+    "workbench.editor.tabSizingFixedMaxWidth": 120,
+    "githubRepositories.autoFetch.enabled": true,
+    "editor.occurrencesHighlight": "off",
+    "workbench.colorCustomizations": {
+        "editorOverviewRuler.background": "#fff0",
+        "tab.border": "#fff0",
+        "tab.unfocusedHoverBorder": "#fff0",
+        "tab.unfocusedActiveBorder":  "#fff0",
+        "tab.inactiveModifiedBorder":  "#fff0",
+        "tab.lastPinnedBorder": "#fff0",
+        "list.warningForeground": "#fbaf3d",
+        "list.errorForeground":"#ef6868",
+        "editorError.foreground": "#fff0",
+        "editorWarning.foreground": "#fff0",
+        "editorInfo.foreground": "#fff0",
+        "editorHint.foreground": "#fff0",
+        "editor.selectionBackground": "#a5bef12d",
+        "editor.selectionHighlightBackground": "#b6a5f121",
+        "editorGutter.errorBackground": "#0000",
+        "minimap.findMatchHighlight": "#e5737369",
+        "minimap.errorHighlight": "#ff3d1134",
+        "minimap.warningHighlight": "#ffb84d23",
+        "minimap.infoHighlight": "#4fc3f730",
+        "minimap.selectionHighlight": "#a5b7f180",
+        // "minimap.selectionHighlight": "#80ff0066", 
+        // "minimapSlider.background": "#5e62721a",
+        "minimapSlider.background": "#6b718c2d",
+
+        // "minimapSlider.background": "#92a2e90b",
+        "minimapSlider.activeBackground": "#b9b9b950",
+        "minimapSlider.hoverBackground": "#b9b9b950",
+        "minimap.chatEditHighlight": "#fff",
+        "minimap.foregroundOpacity": "#000000BF",
+        "minimap.background": "#282c34",
+        // "minimap.background": "#282c34",
+        // "minimap.foregroundOpacity": "#00000090",
+        "minimap.selectionOccurrenceHighlight": "#1a1a1a8c",
+        // "minimapGutter.modifiedBackground": "#1b81a8",
+        "editorError.scrollbarBackground": "#df505036",
+        "editorWarning.scrollbarForeground": "#ffb74d66",
+        "editorInfo.scrollbarForeground": "#4fc3f740",
+        "editorHint.scrollbarForeground": "#81c78440",
+        "editorOverviewRuler.errorForeground": "#ff3609",
+        "editorOverviewRuler.warningForeground": "#ffb84d44",
+        "editorOverviewRuler.infoForeground": "#4fc3f730",
+        // "editorOverviewRuler.bracketMatchForeground": "#808080",
+        "editorGroup.border": "#0000",
+        "editorGroup.dropBackground": "#0000",
+        "editorGroupHeader.tabsBorder": "#0000",
+        "editorGroupHeader.noTabsBorder": "#0000",
+        "scrollbar.shadow": "#00000000",
+        "editorLightBulb.foreground": "#b9b9b9",
+        "editorLightBulbAutoFix.foreground": "#cfcfcf",
+        "editor.foldBackground": "#00000000",
+        "editorCursor.foreground": "#92A9E9",
+        "editorCursor.background":"#ffffff00",
+        "editor.rangeHighlightBackground": "#fff0",
+        "focusBorder": "#fff0",                     // Focused element border (main one!)
+        "button.background": "#839de2",               // Button background
+
+        // Optionally, for more highlights:
+        // "activityBar.border": "#FF5733",
+        // "tab.activeBorder": "#FF5733",
+        // "list.activeSelectionBorder": "#FF5733"
+        "activityBarBadge.background": "#839de2",
+        "activityBarBadge.foreground": "#FFFFFF",
+        
+        // Main badge background color
+        "badge.background": "#839de2",   // Main badge background color
+        "badge.foreground": "#FFFFFF",    // Badge text color
+        "editorBracketHighlight.foreground1": "#ffeedb",
+        "editorBracketHighlight.foreground2": "#7279ff",
+        "editorBracketHighlight.foreground3": "#ff9ebd",
+        "editorBracketHighlight.foreground4": "#ffd16f",
+        "editorBracketHighlight.foreground5": "#f5e5d4",
+        "editorBracketHighlight.foreground6": "#7279ff",
+        "editorIndentGuide.background1": "#ffffff09", // very faint white (hex alpha 10 = 6% opacity)
+        "editorIndentGuide.activeBackground1": "#ffffff09", // slightly less faint for the active guide
+        // "editorBracketPairGuide.background1": "#ffe9d2",
+        "editorBracketPairGuide.background1": "#ffe9d280",
+        "editorBracketPairGuide.background2": "#7279ff80",
+        "editorBracketPairGuide.background3": "#ff9ebd80", 
+        "editorBracketPairGuide.background4": "#ffd16f80",
+        "editorBracketPairGuide.background5": "#f5e5d480",
+        "editorBracketPairGuide.foreground6": "#7279ff90",
+        "terminalCursor.foreground": "#92a9e9",
+        "editorBracketMatch.border": "#00fbff00",     // Faint teal, 53% opacity
+        "editorBracketMatch.background": "#ffffff29",  // Very faint dark background
+        "[Atom One Dark]": {
+            // "editor.lineHighlightBackground": "#22252e",
+            // "editor.lineHighlightBackground": "#21252b",
+            "editor.lineHighlightBackground": "#92a2e917",
+            // "editor.lineHighlightBackground": "#fff",
+        },
+
+        "outlineMap.visibleRangeBackground": "#393e4a",
+        "outlineMap.focusingItemBackground": "#3c4152",
+        // "outlineMap.focusingItemForeground": "#92a9e9",
+
+
+        "symbolIcon.om_TagForeground": "#b7fa70",
+        "symbolIcon.om_RegionForeground": "#73c991",
+
+
+        "symbolIcon.functionForeground":"#61AFEF",
+        "symbolIcon.variableForeground":"#ABB2BF",
+        "symbolIcon.propertyForeground":"#ABB2BF",
+        "symbolIcon.methodForeground":"#61AFEF",
+        // "symbolIcon.interfaceForeground":"#4ec9b0",
+        "symbolIcon.enumeratorForeground":"#4fc1ff",
+        "symbolIcon.keywordForeground": "#b0e17c",
+        "symbolIcon.enumeratorMemberForeground": "#73c991",
+        "symbolIcon.classForeground":"#E5C07B",
+        "symbolIcon.constructorForeground":"#569cd6",
+        "symbolIcon.constantForeground": "#ABB2BF",
+        "symbolIcon.keyForeground": "#C678DD",
+        "symbolIcon.structForeground": "#E5C07B", 
+        "symbolIcon": "#ff0000"
+    }  , 
+
+    "outline-map.region.startRegion": "# group",
+    "outline-map.region.endRegion": "# endgroup",
+    "outline-map.region.tag": "# tag",
+    "editor.lineHeight": 1.5,
+    // "editor.renderLineHighlight": "none",
+    "editor.matchBrackets": "never",
+    "errorLens.statusBarIconsEnabled": true, 
+    "errorLens.problemRangeDecorationEnabled": true,
+    "errorLens.statusBarColorsEnabled": true,
+    "errorLens.codeLensOnClick": "showQuickFix",
+    "errorLens.ignoreDirty": true,
+    "errorLens.statusBarCommand": "goToLine",
+    "errorLens.decorations": {
+        "errorRange": {
+            "textDecoration": ";background-clip:text;border-bottom:1.4px solid #e57373",
+            "backgroundColor": "#fff0",
+        },
+        "warningRange": {
+            "textDecoration": ";background-clip:text;border-bottom:1.4px solid #ffb74d",
+            "backgroundColor": "#fff0",
+        },
+        "infoRange": {
+            "textDecoration": ";background-clip:text;border-bottom:1.4x solid #4fc3f7",
+            "backgroundColor": "#fff0",
+        },
+        "hintRange": {
+            // "textDecoration": ";background-clip:text;border-bottom:1.5px solid #81c784",
+            "backgroundColor": "#fff0",
+        },
+
+        "errorMessage": {
+            "color": "#e5737350",
+            // "padding": "2px 6px",
+            // "backgroundColor": "#fff0",
+            // "fontWeight": "normal"
+        },
+        "warningMessage": {
+            "backgroundColor": "#ffb74d10",
+            "color": "#ffb74d50",
+            // "padding": "0.15em 0.7em",   // (top-bottom, left-right)
+            // "borderRadius": "0.3em",     // (rounded corners helps the look)
+            // "fontWeight": "normal",
+            // "fontSize": "1em",           // (sometimes helps baseline alignment)
+            // "margin": "0 0.2em"          // (optional, adds space before/after message)
+        },
+
+        "infoMessage": {
+            "color": "#4fc3f750",
+            "backgroundColor": "#4fc3f710"
+            // "backgroundColor": "#fff0",
+            // "fontWeight": "normal"
+        },
+
+        "hintMessage": {
+            "color": "#81c78425",
+            "backgroundColor": "#fff0", 
+
+            // "fontWeight": "normal"
+            // "fontSize": "7px"
+        }
+
+    },
+    "errorLens.excludeByMessage": [
+        "code:W0511"
+    ],
+    "workbench.activityBar.location": "bottom",
+    "workbench.statusBar.visible": false,
+
+    "editor.scrollbar.vertical": "hidden",
+    "editor.scrollbar.verticalScrollbarSize": 0,
+    "chat.commandCenter.enabled": false,
+    "workbench.navigationControl.enabled": false,
+    "window.commandCenter": false,
+    "workbench.layoutControl.enabled": false,
+    "editor.wordWrap": "off",
+    "editor.scrollBeyondLastColumn": 300,
+    "editor.scrollbar.horizontal": "auto",
+    "editor.scrollbar.horizontalScrollbarSize": 2,
+    "editor.codeActionsOnSave": {
+
+    },
+    "files.autoSave": "onFocusChange",
+    "editor.renderLineHighlight": "all",
+    "editor.lightbulb.enabled": "off",
+    "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+    "terminal.integrated.ignoreBracketedPasteMode": true,
+    "debug.gutterMiddleClickAction": "none",
+    "diffEditor.renderGutterMenu": false,
+    "testing.gutterEnabled": false,
+    "scm.diffDecorationsGutterAction": "none",
+    "scm.diffDecorationsGutterPattern": {
+        "modified": false
+    },
+    "testing.defaultGutterClickAction": "contextMenu",
+    "scm.diffDecorationsGutterVisibility": "hover",
+    "scm.diffDecorationsGutterWidth": 2,
+    "markdown.preview.linkify": false,
+    "editor.cursorWidth": 2,
+    "editor.cursorStyle": "line",
+    "terminal.integrated.accessibleViewPreserveCursorPosition": true,
+    "editor.guides.highlightActiveBracketPair": false, 
+
+    "editor.foldingHighlight": false,
+    "editor.guides.bracketPairsHorizontal": false,
+    // "editor.matchBrackets": "never",
+    "jetbrains-file-icon-theme.enableGoTestIcons": true,
+    "errorLens.messageEnabled": true,
+    "terminal.integrated.cursorWidth": 2,
+
+    
+    "workbench.tree.indent": 20,
+    "workbench.tree.renderIndentGuides": "none",
+    "editor.guides.indentation": true,
+
+    "vscode_custom_css.imports": [
+        "file:///workspace/.devcontainer/custom.css"
+    ],
+    "projectManager.sortList": "Recent",
+    "remote.autoForwardPortsSource": "hybrid",
+    "errorLens.ignoreUntitled": true,
+    "errorLens.respectUpstreamEnabled": {
+        "statusBar": true
+    },
+    "errorLens.statusBarIconsPriority": 10000,
+    "errorLens.statusBarIconsTargetProblems": "visibleEditors",
+    "errorLens.statusBarMessageEnabled": true,
+    "errorLens.statusBarMessageType": "activeLine",
+    "errorLens.statusBarIconsUseBackground": false,
+    "terminal.integrated.scrollback": 100000,
+
+    "multiCommand.commands": [
+    {
+        "command": "multiCommand.foldThenFoldDocstrings",
+        "sequence": [
+            "editor.unfoldRecursively",
+            "pylance.foldDocstrings"  // <-- this is the Pylance command, adjust if needed
+        ]
+    }
+],
+"remote.SSH.remotePlatform": {
+    "64.176.220.125": "linux",
+    "snellius": "linux"
+},
+"workbench.colorTheme": "Atom One Dark",
+"terminal.integrated.profiles.windows": {
+    "PowerShell": {
+        "source": "PowerShell",
+        "icon": "terminal-powershell"
+    },
+    "Command Prompt": {
+        "path": [
+            "${env:windir}\\Sysnative\\cmd.exe",
+            "${env:windir}\\System32\\cmd.exe"
+        ],
+        "args": [],
+        "icon": "terminal-cmd"
+    },
+    "Git Bash": {
+        "source": "Git Bash"
+    },
+    "Ubuntu (WSL)": {
+        "path": "C:\\WINDOWS\\System32\\wsl.exe",
+        "args": [
+            "-d",
+            "Ubuntu"
+        ]
+    }
+},
+"terminal.integrated.defaultProfile.windows": "Ubuntu (WSL)",
+"python.testing.pytestEnabled": true,
+"python.testing.pytestArgs": [
+    "--rootdir=.",
+    "--asyncio-mode=auto"
+],
+"python.testing.cwd": ".",
+"python.interpreter.infoVisibility": "always",
+"kilo-code.allowedCommands": [
+    "git log",
+    "git diff",
+    "git show",
+    "npm test",
+    "npm install",
+    "tsc"
+],
+"kilo-code.deniedCommands": [],
+"settingsSync.ignoredExtensions": [
+
+
+
+    "brandonkirbyson.vscode-animations"
+],
+"animations.Default-Duration": 100,
+"editor.lineNumbers": "relative",
+"scm.inputFontSize": 12,
+"window.zoomLevel": 0,
+"chat.editor.fontSize": 12,
+"markdown.preview.fontSize": 14,
+"editor.links": false,
+"editor.minimap.showMarkSectionHeaders": true,
+"editor.minimap.showRegionSectionHeaders": true,
+"editor.minimap.markSectionHeaderRegex": "\\bMARK\\s*(?<separator>-?)\\s*(?<label>.*)$",
+"editor.minimap.sectionHeaderFontSize": 8,
+"editor.minimap.sectionHeaderLetterSpacing": 0,
+
+// ------------- animations -------------------
+
+// region: hi
+"animations.Scrolling": "Fade",
+"animations.UseCursorColorForCursorAnimation": true,
+"outline-map.follow": "viewport",
+"outline-map.expand": "cursor",
+"outline-map.customFont": "fira code",
+"better-comments.highlightPlainText": true,
+"editor.minimap.side": "right",
+"editor.minimap.showSlider": "always",
+// "outline-map.customCSS": "file:///c:/Users/Saloc/.vscode/outline-map.css",
+"outline-map.fontSize": 10,
+
+
+
+"editor.copyWithSyntaxHighlighting": false,
+"diffEditor.ignoreTrimWhitespace": false,
+"editor.emptySelectionClipboard": false,
+"workbench.editor.enablePreview": false,
+// "window.newWindowDimensions": "fullscreen",
+// "editor.multiCursorModifier": "ctrlCmd",
+"diffEditor.renderSideBySide": false,
+"editor.snippetSuggestions": "top",
+"editor.detectIndentation": false,
+"window.border": "off", 
+"files.insertFinalNewline": true,
+"files.trimFinalNewlines": true,
+
+"scm.diffDecorationsIgnoreTrimWhitespace": "true",
+"editor.hover.delay": 500,
+"editor.hover.enabled": "on",
+"workbench.tips.enabled": false,
+// "workbench.startupEditor": "none",
+"editor.roundedSelection": true,
+"editor.overviewRulerBorder": false,
+"editor.renderControlCharacters": false,
+"editor.hideCursorInOverviewRuler": true,
+"editor.gotoLocation.multipleReferences": "goto",
+"editor.gotoLocation.multipleTypeDefinitions": "goto",
+"editor.gotoLocation.multipleDeclarations": "goto",
+"editor.gotoLocation.multipleDefinitions": "goto",
+"editor.gotoLocation.multipleImplementations": "goto",
+"workbench.editor.enablePreviewFromQuickOpen": false,
+"workbench.editor.empty.hint": "hidden",
+
+"python.analysis.typeCheckingMode": "strict", //strict
+"editor.minimap.renderCharacters": false,
+"editor.minimap.scale": 1,
+"editor.minimap.size": "fit",
+"editor.minimap.maxColumn": 120,
+"inlineChat.lineNaturalLanguageHint": false,
+"dev.containers.dockerComposePath": "",
+"dev.containers.dockerPath": "Docker",
+"dev.containers.executeInWSL": true,
+"explorer.fileNesting.patterns": {
+    "//": "Last update at 15/05/2026, 17:24:32",
+    ".agent": ".agent, .claude, .cline, .codebuddy, .codex, .commandcode, .continue, .crush, .cursor, .factory, .gemini, .goose, .junie, .kilocode, .kiro, .kode, .mcpjam, .mux, .neovate, .opencode, .openhands, .pi, .pochi, .qoder, .qwen, .roo, .trae, .windsurf, .zencoder",
+    ".clang-tidy": ".clang-format, .clangd, compile_commands.json",
+    ".env": "*.env, .env.*, .envrc, env.d.ts",
+    ".gitignore": ".gitattributes, .gitmodules, .gitmessage, .lfsconfig, .mailmap, .git-blame*",
+    ".project": ".classpath",
+    "+layout.svelte": "+layout.ts,+layout.js,+layout.server.ts,+layout.server.js,+layout.gql",
+    "+page.svelte": "+page.server.ts,+page.server.js,+page.ts,+page.js,+page.gql",
+    "AGENTS.md": ".clinerules, .cursorrules, .replit.md, .windsurfrules, AGENT.md, CLAUDE.local.md, CLAUDE.md, GEMINI.md",
+    "ansible.cfg": "ansible.cfg, .ansible-lint, requirements.yml",
+    "app.config.*": "*.env, .babelrc*, .codecov, .cssnanorc*, .env.*, .envrc, .htmlnanorc*, .lighthouserc.*, .mocha*, .postcssrc*, .terserrc*, api-extractor.json, ava.config.*, babel.config.*, capacitor.config.*, content.config.*, contentlayer.config.*, cssnano.config.*, cypress.*, env.d.ts, formkit.config.*, formulate.config.*, histoire.config.*, htmlnanorc.*, i18n.config.*, ionic.config.*, jasmine.*, jest.config.*, jsconfig.*, karma*, lighthouserc.*, panda.config.*, playwright.config.*, postcss.config.*, puppeteer.config.*, react-router.config.*, rspack.config.*, sst.config.*, svgo.config.*, tailwind.config.*, tsconfig.*, tsdoc.*, uno.config.*, unocss.config.*, vitest.config.*, vuetify.config.*, webpack.config.*, windi.config.*",
+    "application.properties": "*.properties",
+    "artisan": "*.env, .babelrc*, .codecov, .cssnanorc*, .env.*, .envrc, .htmlnanorc*, .lighthouserc.*, .mocha*, .postcssrc*, .terserrc*, api-extractor.json, ava.config.*, babel.config.*, capacitor.config.*, content.config.*, contentlayer.config.*, cssnano.config.*, cypress.*, env.d.ts, formkit.config.*, formulate.config.*, histoire.config.*, htmlnanorc.*, i18n.config.*, ionic.config.*, jasmine.*, jest.config.*, jsconfig.*, karma*, lighthouserc.*, panda.config.*, playwright.config.*, postcss.config.*, puppeteer.config.*, react-router.config.*, rspack.config.*, server.php, sst.config.*, svgo.config.*, tailwind.config.*, tsconfig.*, tsdoc.*, uno.config.*, unocss.config.*, vitest.config.*, vuetify.config.*, webpack.config.*, webpack.mix.js, windi.config.*",
+    "astro.config.*": "*.env, .babelrc*, .codecov, .cssnanorc*, .env.*, .envrc, .htmlnanorc*, .lighthouserc.*, .mocha*, .postcssrc*, .terserrc*, api-extractor.json, ava.config.*, babel.config.*, capacitor.config.*, content.config.*, contentlayer.config.*, cssnano.config.*, cypress.*, env.d.ts, formkit.config.*, formulate.config.*, histoire.config.*, htmlnanorc.*, i18n.config.*, ionic.config.*, jasmine.*, jest.config.*, jsconfig.*, karma*, lighthouserc.*, panda.config.*, playwright.config.*, postcss.config.*, puppeteer.config.*, react-router.config.*, rspack.config.*, sst.config.*, svgo.config.*, tailwind.config.*, tsconfig.*, tsdoc.*, uno.config.*, unocss.config.*, vitest.config.*, vuetify.config.*, webpack.config.*, windi.config.*",
+    "build-wrapper.log": "build-wrapper*.log, build-wrapper-dump*.json, build-wrapper-win*.exe, build-wrapper-linux*, build-wrapper-macosx*",
+    "BUILD.bazel": "*.bzl, *.bazel, *.bazelrc, bazel.rc, .bazelignore, .bazelproject, .bazelversion, MODULE.bazel.lock, WORKSPACE",
+    "build.gradle": "settings.gradle, gradlew, gradlew.bat, gradle.properties, gradle.lockfile",
+    "build.gradle.kts": "settings.gradle.kts, gradlew, gradlew.bat, gradle.properties, gradle.lockfile",
+    "Cargo.toml": ".clippy.toml, .rustfmt.toml, Cargo.Bazel.lock, Cargo.lock, clippy.toml, cross.toml, insta.yaml, rust-toolchain.toml, rustfmt.toml",
+    "CMakeLists.txt": "*.cmake, *.cmake.in, .cmake-format.yaml, CMakePresets.json, CMakeCache.txt",
+    "composer.json": ".php*.cache, composer.lock, phpunit.xml*, psalm*.xml",
+    "default.nix": "shell.nix",
+    "deno.json*": "*.env, .env.*, .envrc, api-extractor.json, deno.lock, env.d.ts, import-map.json, import_map.json, jsconfig.*, tsconfig.*, tsdoc.*",
+    "Dockerfile": "*.dockerfile, .devcontainer.*, .dockerignore, Dockerfile*, captain-definition, compose.*, docker-compose.*, dockerfile*",
+    "flake.nix": "default.nix, shell.nix, flake.lock",
+    "gatsby-config.*": "*.env, .babelrc*, .codecov, .cssnanorc*, .env.*, .envrc, .htmlnanorc*, .lighthouserc.*, .mocha*, .postcssrc*, .terserrc*, api-extractor.json, ava.config.*, babel.config.*, capacitor.config.*, content.config.*, contentlayer.config.*, cssnano.config.*, cypress.*, env.d.ts, formkit.config.*, formulate.config.*, gatsby-browser.*, gatsby-node.*, gatsby-ssr.*, gatsby-transformer.*, histoire.config.*, htmlnanorc.*, i18n.config.*, ionic.config.*, jasmine.*, jest.config.*, jsconfig.*, karma*, lighthouserc.*, panda.config.*, playwright.config.*, postcss.config.*, puppeteer.config.*, react-router.config.*, rspack.config.*, sst.config.*, svgo.config.*, tailwind.config.*, tsconfig.*, tsdoc.*, uno.config.*, unocss.config.*, vitest.config.*, vuetify.config.*, webpack.config.*, windi.config.*",
+    "gemfile": ".ruby-version, gemfile.lock",
+    "go.mod": ".air*, go.sum",
+    "go.work": "go.work.sum",
+    "hatch.toml": ".editorconfig, .flake8, .isort.cfg, .python-version, hatch.toml, requirements*.in, requirements*.pip, requirements*.txt, tox.ini",
+    "I*.cs": "$(capture).cs",
+    "Makefile": "*.mk",
+    "mix.exs": ".credo.exs, .dialyzer_ignore.exs, .formatter.exs, .iex.exs, .tool-versions, mix.lock",
+    "next.config.*": "*.env, .babelrc*, .codecov, .cssnanorc*, .env.*, .envrc, .htmlnanorc*, .lighthouserc.*, .mocha*, .postcssrc*, .terserrc*, api-extractor.json, ava.config.*, babel.config.*, capacitor.config.*, content.config.*, contentlayer.config.*, cssnano.config.*, cypress.*, env.d.ts, formkit.config.*, formulate.config.*, histoire.config.*, htmlnanorc.*, i18n.config.*, ionic.config.*, jasmine.*, jest.config.*, jsconfig.*, karma*, lighthouserc.*, next-env.d.ts, next-i18next.config.*, panda.config.*, playwright.config.*, postcss.config.*, puppeteer.config.*, react-router.config.*, rspack.config.*, sst.config.*, svgo.config.*, tailwind.config.*, tsconfig.*, tsdoc.*, uno.config.*, unocss.config.*, vitest.config.*, vuetify.config.*, webpack.config.*, windi.config.*",
+    "nuxt.config.*": "*.env, .babelrc*, .codecov, .cssnanorc*, .env.*, .envrc, .htmlnanorc*, .lighthouserc.*, .mocha*, .nuxtignore, .nuxtrc, .postcssrc*, .terserrc*, api-extractor.json, ava.config.*, babel.config.*, capacitor.config.*, content.config.*, contentlayer.config.*, cssnano.config.*, cypress.*, env.d.ts, formkit.config.*, formulate.config.*, histoire.config.*, htmlnanorc.*, i18n.config.*, ionic.config.*, jasmine.*, jest.config.*, jsconfig.*, karma*, lighthouserc.*, panda.config.*, playwright.config.*, postcss.config.*, puppeteer.config.*, react-router.config.*, rspack.config.*, sst.config.*, svgo.config.*, tailwind.config.*, tsconfig.*, tsdoc.*, uno.config.*, unocss.config.*, vitest.config.*, vuetify.config.*, webpack.config.*, windi.config.*",
+    "package.json": "*.code-workspace, .browserslist*, .circleci*, .commitlint*, .cspell*, .cursor*, .cz-config.js, .czrc, .dlint.json, .dprint.json*, .editorconfig, .eslint*, .firebase*, .flowconfig, .github*, .gitlab*, .gitmojirc.json, .gitpod*, .huskyrc*, .jslint*, .knip.*, .lintstagedrc*, .ls-lint.yml, .markdownlint*, .node-version, .nodemon*, .npm*, .nvmrc, .oxfmtrc.json, .oxfmtrc.json.bak, .oxfmtrc.jsonc, .oxlintrc.json, .oxlintrc.json.bak, .oxlintrc.jsonc, .pm2*, .pnp.*, .pnpm*, .prettier*, .pylintrc, .release-please*.json, .releaserc*, .ruff.toml, .sentry*, .shellcheckrc, .simple-git-hooks*, .stackblitz*, .styleci*, .stylelint*, .tazerc*, .textlint*, .tool-versions, .travis*, .versionrc*, .vscode*, .watchman*, .windsurfrules, .xo-config*, .yamllint*, .yarnrc*, Procfile, alejandra.toml, apollo.config.*, appveyor*, azure-pipelines*, biome.json*, bower.json, build.config.*, bun.lock, bun.lockb, bunfig.toml, colada.options.ts, commitlint*, crowdin*, cspell*, cz.config.*, dangerfile*, dlint.json, dprint.json*, ec.config.*, electron-builder.*, eslint*, firebase.json, grunt*, gulp*, jenkins*, knip.*, lefthook.*, lerna*, lint-staged*, nest-cli.*, netlify*, nixpacks*, nodemon*, npm-shrinkwrap.json, nx.*, oxfmt.config.*, oxlint.config.*, package-lock.json, package.nls*.json, phpcs.xml, pm2.*, pnpm*, prettier*, pullapprove*, pyrightconfig.json, release-please*.json, release-tasks.sh, release.config.*, renovate*, rolldown.config.*, rollup.config.*, rspack*, ruff.toml, sentry.*.config.ts, simple-git-hooks*, sonar-project.properties, stylelint*, taze.config.*, tsdown.config.*, tslint*, tsup.config.*, turbo*, typedoc*, unlighthouse*, vercel*, vetur.config.*, webpack*, workspace.json, wrangler.*, xo.config.*, yarn*",
+    "Pipfile": ".editorconfig, .flake8, .isort.cfg, .python-version, Pipfile, Pipfile.lock, requirements*.in, requirements*.pip, requirements*.txt, tox.ini",
+    "pom.xml": "mvnw*",
+    "pubspec.yaml": ".metadata, .packages, all_lint_rules.yaml, analysis_options.yaml, build.yaml, pubspec.lock, pubspec_overrides.yaml",
+    "pyproject.toml": ".commitlint*, .cspell*, .dlint.json, .dprint.json*, .editorconfig, .eslint*, .flake8, .flowconfig, .isort.cfg, .jslint*, .lintstagedrc*, .ls-lint.yml, .markdownlint*, .oxfmtrc.json, .oxfmtrc.json.bak, .oxfmtrc.jsonc, .oxlintrc.json, .oxlintrc.json.bak, .oxlintrc.jsonc, .pdm-python, .pdm.toml, .prettier*, .pylintrc, .python-version, .ruff.toml, .shellcheckrc, .stylelint*, .textlint*, .xo-config*, .yamllint*, MANIFEST.in, Pipfile, Pipfile.lock, alejandra.toml, biome.json*, commitlint*, cspell*, dangerfile*, dlint.json, dprint.json*, eslint*, hatch.toml, lint-staged*, oxfmt.config.*, oxlint.config.*, pdm.lock, phpcs.xml, poetry.lock, poetry.toml, prettier*, pyproject.toml, pyrightconfig.json, requirements*.in, requirements*.pip, requirements*.txt, ruff.toml, setup.cfg, setup.py, stylelint*, tox.ini, tslint*, uv.lock, uv.toml, xo.config.*",
+    "quasar.conf*": "*.env, .babelrc*, .codecov, .cssnanorc*, .env.*, .envrc, .htmlnanorc*, .lighthouserc.*, .mocha*, .postcssrc*, .terserrc*, api-extractor.json, ava.config.*, babel.config.*, capacitor.config.*, content.config.*, contentlayer.config.*, cssnano.config.*, cypress.*, env.d.ts, formkit.config.*, formulate.config.*, histoire.config.*, htmlnanorc.*, i18n.config.*, ionic.config.*, jasmine.*, jest.config.*, jsconfig.*, karma*, lighthouserc.*, panda.config.*, playwright.config.*, postcss.config.*, puppeteer.config.*, quasar.extensions.json, react-router.config.*, rspack.config.*, sst.config.*, svgo.config.*, tailwind.config.*, tsconfig.*, tsdoc.*, uno.config.*, unocss.config.*, vitest.config.*, vuetify.config.*, webpack.config.*, windi.config.*",
+    "readme*": "AUTHORS, Authors, BACKERS*, Backers*, CHANGELOG*, CITATION*, CODEOWNERS, CODE_OF_CONDUCT*, CONTRIBUTING*, CONTRIBUTORS, CONTRIBUTORS.MD, CONTRIBUTORS.TXT, COPYING*, CREDITS, Changelog*, Citation*, Code_Of_Conduct*, Codeowners, Contributing*, Contributors, Contributors.md, Contributors.txt, Copying*, Credits, GOVERNANCE.MD, Governance.md, HISTORY.MD, History.md, LICENSE, LICENSE.MD, LICENSE.txt, License, License.md, License.txt, MAINTAINERS, Maintainers, README-*, README_*, RELEASE_NOTES*, ROADMAP.MD, Readme-*, Readme_*, Release_Notes*, Roadmap.md, SECURITY.MD, SPONSORS*, Security.md, Sponsors*, authors, backers*, changelog*, citation*, code_of_conduct*, codeowners, contributing*, contributors, contributors.md, contributors.txt, copying*, credits, governance.md, history.md, license, license.md, license.txt, maintainers, readme-*, readme_*, release_notes*, roadmap.md, security.md, sponsors*",
+    "Readme*": "AUTHORS, Authors, BACKERS*, Backers*, CHANGELOG*, CITATION*, CODEOWNERS, CODE_OF_CONDUCT*, CONTRIBUTING*, CONTRIBUTORS, CONTRIBUTORS.MD, CONTRIBUTORS.TXT, COPYING*, CREDITS, Changelog*, Citation*, Code_Of_Conduct*, Codeowners, Contributing*, Contributors, Contributors.md, Contributors.txt, Copying*, Credits, GOVERNANCE.MD, Governance.md, HISTORY.MD, History.md, LICENSE, LICENSE.MD, LICENSE.txt, License, License.md, License.txt, MAINTAINERS, Maintainers, README-*, README_*, RELEASE_NOTES*, ROADMAP.MD, Readme-*, Readme_*, Release_Notes*, Roadmap.md, SECURITY.MD, SPONSORS*, Security.md, Sponsors*, authors, backers*, changelog*, citation*, code_of_conduct*, codeowners, contributing*, contributors, contributors.md, contributors.txt, copying*, credits, governance.md, history.md, license, license.md, license.txt, maintainers, readme-*, readme_*, release_notes*, roadmap.md, security.md, sponsors*",
+    "README*": "AUTHORS, Authors, BACKERS*, Backers*, CHANGELOG*, CITATION*, CODEOWNERS, CODE_OF_CONDUCT*, CONTRIBUTING*, CONTRIBUTORS, CONTRIBUTORS.MD, CONTRIBUTORS.TXT, COPYING*, CREDITS, Changelog*, Citation*, Code_Of_Conduct*, Codeowners, Contributing*, Contributors, Contributors.md, Contributors.txt, Copying*, Credits, GOVERNANCE.MD, Governance.md, HISTORY.MD, History.md, LICENSE, LICENSE.MD, LICENSE.txt, License, License.md, License.txt, MAINTAINERS, Maintainers, README-*, README_*, RELEASE_NOTES*, ROADMAP.MD, Readme-*, Readme_*, Release_Notes*, Roadmap.md, SECURITY.MD, SPONSORS*, Security.md, Sponsors*, authors, backers*, changelog*, citation*, code_of_conduct*, codeowners, contributing*, contributors, contributors.md, contributors.txt, copying*, credits, governance.md, history.md, license, license.md, license.txt, maintainers, readme-*, readme_*, release_notes*, roadmap.md, security.md, sponsors*",
+    "remix.config.*": "*.env, .babelrc*, .codecov, .cssnanorc*, .env.*, .envrc, .htmlnanorc*, .lighthouserc.*, .mocha*, .postcssrc*, .terserrc*, api-extractor.json, ava.config.*, babel.config.*, capacitor.config.*, content.config.*, contentlayer.config.*, cssnano.config.*, cypress.*, env.d.ts, formkit.config.*, formulate.config.*, histoire.config.*, htmlnanorc.*, i18n.config.*, ionic.config.*, jasmine.*, jest.config.*, jsconfig.*, karma*, lighthouserc.*, panda.config.*, playwright.config.*, postcss.config.*, puppeteer.config.*, react-router.config.*, remix.*, rspack.config.*, sst.config.*, svgo.config.*, tailwind.config.*, tsconfig.*, tsdoc.*, uno.config.*, unocss.config.*, vitest.config.*, vuetify.config.*, webpack.config.*, windi.config.*",
+    "requirements.txt": ".editorconfig, .flake8, .isort.cfg, .python-version, requirements*.in, requirements*.pip, requirements*.txt, tox.ini",
+    "rush.json": "*.code-workspace, .browserslist*, .circleci*, .commitlint*, .cspell*, .cursor*, .cz-config.js, .czrc, .dlint.json, .dprint.json*, .editorconfig, .eslint*, .firebase*, .flowconfig, .github*, .gitlab*, .gitmojirc.json, .gitpod*, .huskyrc*, .jslint*, .knip.*, .lintstagedrc*, .ls-lint.yml, .markdownlint*, .node-version, .nodemon*, .npm*, .nvmrc, .oxfmtrc.json, .oxfmtrc.json.bak, .oxfmtrc.jsonc, .oxlintrc.json, .oxlintrc.json.bak, .oxlintrc.jsonc, .pm2*, .pnp.*, .pnpm*, .prettier*, .pylintrc, .release-please*.json, .releaserc*, .ruff.toml, .sentry*, .shellcheckrc, .simple-git-hooks*, .stackblitz*, .styleci*, .stylelint*, .tazerc*, .textlint*, .tool-versions, .travis*, .versionrc*, .vscode*, .watchman*, .windsurfrules, .xo-config*, .yamllint*, .yarnrc*, Procfile, alejandra.toml, apollo.config.*, appveyor*, azure-pipelines*, biome.json*, bower.json, build.config.*, bun.lock, bun.lockb, bunfig.toml, colada.options.ts, commitlint*, crowdin*, cspell*, cz.config.*, dangerfile*, dlint.json, dprint.json*, ec.config.*, electron-builder.*, eslint*, firebase.json, grunt*, gulp*, jenkins*, knip.*, lefthook.*, lerna*, lint-staged*, nest-cli.*, netlify*, nixpacks*, nodemon*, npm-shrinkwrap.json, nx.*, oxfmt.config.*, oxlint.config.*, package-lock.json, package.nls*.json, phpcs.xml, pm2.*, pnpm*, prettier*, pullapprove*, pyrightconfig.json, release-please*.json, release-tasks.sh, release.config.*, renovate*, rolldown.config.*, rollup.config.*, rspack*, ruff.toml, sentry.*.config.ts, simple-git-hooks*, sonar-project.properties, stylelint*, taze.config.*, tsdown.config.*, tslint*, tsup.config.*, turbo*, typedoc*, unlighthouse*, vercel*, vetur.config.*, webpack*, workspace.json, wrangler.*, xo.config.*, yarn*",
+    "sanity.config.*": "sanity.cli.*, sanity.types.ts, schema.json",
+    "setup.cfg": ".editorconfig, .flake8, .isort.cfg, .python-version, MANIFEST.in, requirements*.in, requirements*.pip, requirements*.txt, setup.cfg, tox.ini",
+    "setup.py": ".editorconfig, .flake8, .isort.cfg, .python-version, MANIFEST.in, requirements*.in, requirements*.pip, requirements*.txt, setup.cfg, setup.py, tox.ini",
+    "shims.d.ts": "*.d.ts",
+    "svelte.config.*": "*.env, .babelrc*, .codecov, .cssnanorc*, .env.*, .envrc, .htmlnanorc*, .lighthouserc.*, .mocha*, .postcssrc*, .terserrc*, api-extractor.json, ava.config.*, babel.config.*, capacitor.config.*, content.config.*, contentlayer.config.*, cssnano.config.*, cypress.*, env.d.ts, formkit.config.*, formulate.config.*, histoire.config.*, houdini.config.*, htmlnanorc.*, i18n.config.*, ionic.config.*, jasmine.*, jest.config.*, jsconfig.*, karma*, lighthouserc.*, mdsvex.config.js, panda.config.*, playwright.config.*, postcss.config.*, puppeteer.config.*, react-router.config.*, rspack.config.*, sst.config.*, svgo.config.*, tailwind.config.*, tsconfig.*, tsdoc.*, uno.config.*, unocss.config.*, vite.config.*, vitest.config.*, vuetify.config.*, webpack.config.*, windi.config.*",
+    "tauri.conf.json": "tauri.*.conf.json",
+    "tauri.conf.json5": "tauri.*.conf.json5",
+    "Tauri.toml": "Tauri.*.toml",
+    "tsconfig.json": "tsconfig*.tsbuildinfo, tsconfig.*.json",
+    "vite.config.*": "*.env, .babelrc*, .codecov, .cssnanorc*, .env.*, .envrc, .htmlnanorc*, .lighthouserc.*, .mocha*, .postcssrc*, .terserrc*, api-extractor.json, ava.config.*, babel.config.*, capacitor.config.*, content.config.*, contentlayer.config.*, cssnano.config.*, cypress.*, env.d.ts, formkit.config.*, formulate.config.*, histoire.config.*, htmlnanorc.*, i18n.config.*, ionic.config.*, jasmine.*, jest.config.*, jsconfig.*, karma*, lighthouserc.*, panda.config.*, playwright.config.*, postcss.config.*, puppeteer.config.*, react-router.config.*, rspack.config.*, sst.config.*, svgo.config.*, tailwind.config.*, tsconfig.*, tsdoc.*, uno.config.*, unocss.config.*, vitest.config.*, vuetify.config.*, webpack.config.*, windi.config.*",
+    "vue.config.*": "*.env, .babelrc*, .codecov, .cssnanorc*, .env.*, .envrc, .htmlnanorc*, .lighthouserc.*, .mocha*, .postcssrc*, .terserrc*, api-extractor.json, ava.config.*, babel.config.*, capacitor.config.*, content.config.*, contentlayer.config.*, cssnano.config.*, cypress.*, env.d.ts, formkit.config.*, formulate.config.*, histoire.config.*, htmlnanorc.*, i18n.config.*, ionic.config.*, jasmine.*, jest.config.*, jsconfig.*, karma*, lighthouserc.*, panda.config.*, playwright.config.*, postcss.config.*, puppeteer.config.*, react-router.config.*, rspack.config.*, sst.config.*, svgo.config.*, tailwind.config.*, tsconfig.*, tsdoc.*, uno.config.*, unocss.config.*, vitest.config.*, vuetify.config.*, webpack.config.*, windi.config.*",
+    "*.asax": "$(capture).*.cs, $(capture).*.vb",
+    "*.ascx": "$(capture).*.cs, $(capture).*.vb",
+    "*.ashx": "$(capture).*.cs, $(capture).*.vb",
+    "*.aspx": "$(capture).*.cs, $(capture).*.vb",
+    "*.axaml": "$(capture).axaml.cs",
+    "*.bloc.dart": "$(capture).event.dart, $(capture).state.dart",
+    "*.c": "$(capture).h",
+    "*.cc": "$(capture).hpp, $(capture).h, $(capture).hxx, $(capture).hh",
+    "*.cjs": "$(capture).cjs.map, $(capture).*.cjs, $(capture)_*.cjs",
+    "*.component.ts": "$(capture).component.html, $(capture).component.spec.ts, $(capture).component.css, $(capture).component.scss, $(capture).component.sass, $(capture).component.less",
+    "*.cpp": "$(capture).hpp, $(capture).h, $(capture).hxx, $(capture).hh",
+    "*.cs": "$(capture).*.cs, $(capture).cs.uid",
+    "*.cshtml": "$(capture).cshtml.cs, $(capture).cshtml.css",
+    "*.csproj": "*.config, *proj.user, appsettings.*, bundleconfig.json",
+    "*.css": "$(capture).css.map, $(capture).*.css",
+    "*.cxx": "$(capture).hpp, $(capture).h, $(capture).hxx, $(capture).hh",
+    "*.dart": "$(capture).freezed.dart, $(capture).g.dart, $(capture).mapper.dart",
+    "*.db": "*.db-shm, *.db-wal",
+    "*.ex": "$(capture).html.eex, $(capture).html.heex, $(capture).html.leex",
+    "*.fs": "$(capture).fs.js, $(capture).fs.js.map, $(capture).fs.jsx, $(capture).fs.ts, $(capture).fs.tsx, $(capture).fs.rs, $(capture).fs.php, $(capture).fs.dart",
+    "*.gd": "$(capture).gd.uid",
+    "*.gdshader": "$(capture).gdshader.uid",
+    "*.gdshaderinc": "$(capture).gdshaderinc.uid",
+    "*.go": "$(capture)_test.go",
+    "*.java": "$(capture).class",
+    "*.js": "$(capture).js.map, $(capture).*.js, $(capture)_*.js, $(capture).d.ts, $(capture).d.ts.map, $(capture).js.flow",
+    "*.jsx": "$(capture).js, $(capture).*.jsx, $(capture)_*.js, $(capture)_*.jsx, $(capture).css, $(capture).module.css, $(capture).less, $(capture).module.less, $(capture).module.less.d.ts, $(capture).scss, $(capture).module.scss, $(capture).module.scss.d.ts",
+    "*.master": "$(capture).*.cs, $(capture).*.vb",
+    "*.md": "$(capture).*",
+    "*.mjs": "$(capture).mjs.map, $(capture).*.mjs, $(capture)_*.mjs",
+    "*.module.ts": "$(capture).resolver.ts, $(capture).controller.ts, $(capture).service.ts",
+    "*.mts": "$(capture).mts.map, $(capture).*.mts, $(capture)_*.mts",
+    "*.proto": "$(capture).pb.go, $(capture).pb.micro.go",
+    "*.pubxml": "$(capture).pubxml.user",
+    "*.py": "$(capture).pyi",
+    "*.razor": "$(capture).razor.cs, $(capture).razor.css, $(capture).razor.scss",
+    "*.resx": "$(capture).*.resx, $(capture).designer.cs, $(capture).designer.vb",
+    "*.tex": "$(capture).acn, $(capture).acr, $(capture).alg, $(capture).aux, $(capture).bbl, $(capture).bbl-SAVE-ERROR, $(capture).bcf, $(capture).bib, $(capture).blg, $(capture).fdb_latexmk, $(capture).fls, $(capture).glg, $(capture).glo, $(capture).gls, $(capture).idx, $(capture).ind, $(capture).ist, $(capture).lof, $(capture).log, $(capture).lot, $(capture).nav, $(capture).out, $(capture).run.xml, $(capture).snm, $(capture).synctex.gz, $(capture).toc, $(capture).xdv",
+    "*.ts": "$(capture).js, $(capture).d.ts.map, $(capture).*.ts, $(capture)_*.js, $(capture)_*.ts",
+    "*.tsx": "$(capture).ts, $(capture).*.ts, $(capture).*.tsx, $(capture)_*.ts, $(capture)_*.tsx, $(capture).css, $(capture).module.css, $(capture).less, $(capture).module.less, $(capture).module.less.d.ts, $(capture).scss, $(capture).module.scss, $(capture).module.scss.d.ts, $(capture).css.ts",
+    "*.vbproj": "*.config, *proj.user, appsettings.*, bundleconfig.json",
+    "*.vue": "$(capture).*.ts, $(capture).*.js, $(capture).story.vue",
+    "*.w": "$(capture).*.w, I$(capture).w",
+    "*.wat": "$(capture).wasm",
+    "*.xaml": "$(capture).xaml.cs"
+},
+"autoDocstring.docstringFormat": "numpy",
+"chatgpt-docstrings.docstringStyle": "numpy",
+"chatgpt-docstrings.onNewLine": true,
+"csv.enabled": true,
+"catppuccin-icons.hidesExplorerArrows": true,
+"catppuccin-noctis-icons.hidesExplorerArrows": false,
+"workbench.iconTheme": "flow-dim",
+"jupyter.widgetScriptSources": [
+    "jsdelivr.com",
+    "unpkg.com"
+],
+"notebook.markup.fontSize": 12,
+// "notebook.markdown.lineHeight": 2,
+// "notebook.gotoSymbols.showAllSymbols": true,
+// "notebook.lineNumbers": "on",
+"notebook.compactView": true,
+"notebook.output.scrolling": true,
+"notebook.output.textLineLimit": 20,
+"notebook.output.wordWrap": true,
+"notebook.diff.overviewRuler": true,
+"notebook.output.fontFamily": "fira code",
+"notebook.markup.fontFamily": "fira code light",
+"outline-map.toggleHiddenNotCommentSymbol": false,
+"outline-map.defaultMaxDepth": 2,
+"editor.suggest.matchOnWordStartOnly": false,
+"typescript.tsserver.web.projectWideIntellisense.enabled": false,
+"jupyter.enableExtendedPythonKernelCompletions": true,
+"editor.suggest.showSnippets": false,
+"python.analysis.inlayHints.pytestParameters": true,
+"python.analysis.autoFormatStrings": true,
+"python.analysis.completeFunctionParens": true,
+"python.analysis.generateWithTypeAnnotation": true,
+"python.analysis.inlayHints.functionReturnTypes": true,
+"python.analysis.showOnlyDirectDependenciesInAutoImport": true,
+"python.analysis.typeEvaluation.deprecateTypingAliases": true,
+"python.analysis.typeEvaluation.enableReachabilityAnalysis": true,
+"python.analysis.typeEvaluation.disableBytesTypePromotions": true,
+"python.analysis.typeEvaluation.strictDictionaryInference": true,
+"python.analysis.typeEvaluation.strictListInference": true,
+"python.analysis.typeEvaluation.strictSetInference": true,
+"claudeCode.preferredLocation": "panel",
+"git.confirmSync": false,
+"editor.stickyScroll.enabled": false,
+"remote.SSH.path": "C:\\Users\\Saloc\\bin\\ssh.bat",
+"chat.viewSessions.orientation": "stacked",
+"git.suggestSmartCommit": false,
+
+"highlightOnCopy.backgroundColor": "rgba(146, 169, 233, .3)",
+// by default the foreground text color it's undefined, meaning the actual color won't be modified
+"highlightOnCopy.foregroundColor": "#fff",
+"highlightOnCopy.timeout": 200,
+"haskell.manageHLS": "GHCup",
+
+"r.rterm.option": [
+    // "--r-binary=/usr/local/bin/R",
+    "--no-save",
+    "--no-restore",
+],
+"r.rterm.mac": "/opt/homebrew/bin/radian",
+"r.bracketedPaste": true,
+
+"files.associations": {
+    "*.tidal": "haskell"
+},
+
+"tidalcycles.sounds.paths": [
+    "/Users/salomepoulain/Library/Application Support/SuperCollider/downloaded-quarks/Dirt-Samples/"
+],
+"settingsSync.ignoredSettings": [
+    "kaggle.cliPath"
+],
+"dataWrangler.defaultViewingFilterOptions": "advanced",
+"dataWrangler.outputRenderer.columnInsights.displayByDefault": true,
+"animations.Install-Method": "Custom CSS and JS",
+"animations.Enabled": true,
+"flow-icons.activeIconPack": {
+    
+},
+"flow-icons.licenseKey": "FLOW-6F3WPA-UO6JQQ-CR09HB-7MRMTA",            
+
+
+"flow-icons.files.associations": {
+    // ".gitignore": "git",
+    "TODO": "todo",
+    "todo" : "todo"
+},
+
+"flow-icons.folders.associations": {       
+".venv": "python",
+".obsidian": "redux",
+".makery": "firebase",
+// ".makery":"mojo"
+"report": "docs",
+"output": "content",
+".local": "archive",
+"__LOCAL__": "archive",
+".vault": "obsidian"
+
+// ".makery/*": "brown",
+// "cook/skills": "brown",
+// "cook/contract": "brown",
+// "cook": "brown",
+// "workbench": "brown",
+// "pantry":"brown",
+// "headchef":"brown",
+// "orders":"brown",
+// "kitchen":"brown",
+// "office":"brown",
+// "office/**":"brown",
+// "office/cabinet":"brown",
+// "office/station-template":"brown"
+
+},
+"flow-icons.folderColor": "blue",
+"flow-icons.hidesExplorerArrows": false,
+"chat.fontSize": 12,
+
+// "terminal.integrated.fontFamily": "'MesloLGS NF', monospace",
+"workbench.layoutControl.type": "menu",
+"apc.menubar.compact": true,
+"workbench.startupEditor": "none",
+"notebook.stickyScroll.enabled": true,
+
+"dev.containers.dockerPath": "docker",
+"docker.dockerPath": "docker",
+"explorer.fileNesting.enabled": true,
+"explorer.fileNesting.expand": false,
+"window.newWindowProfile": null,
+"workbench.productIconTheme": "polar-black-ui",
+"editor.fontSize": 12,
+"editor.codeLensFontFamily": "fira code",
+"editor.inlayHints.fontFamily": "fira code",
+"debug.console.fontSize": 12,
+"terminal.integrated.fontSize": 12,
+"terminal.integrated.fontLigatures.enabled": true,
+"terminal.integrated.fontLigatures.featureSettings": ""
+
+}

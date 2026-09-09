@@ -47,7 +47,7 @@ cd "$REPO_ROOT" || exit 1
 
 PROJECT_NAME=$(basename "$REPO_ROOT")
 SHADOW_DIR="${MAKERY_SHADOW_DIR:-$HOME/.shadow/projects}/$PROJECT_NAME"
-STATIONS_DIR=".makery/kitchen/stations"
+STATIONS_DIR=".makery/stations"
 LEDGER="$SHADOW_DIR/.ledger"
 
 mkdir -p "$SHADOW_DIR"

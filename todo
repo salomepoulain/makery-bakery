@@ -1,0 +1,12 @@
+☐ include maybe a .docker thing to all pantries in which the ENVS are being written down and added to compose.yaml
+
+☐ set up a config thing for the bakery:
+- light dark mode
+- uses git
+- uses docker
+- verbose
+
+- 5 gangen dinner
+    (bake hier verschillende combinaties aan commands)
+
+- maybe have the pantry files moved and not copied? to save space?

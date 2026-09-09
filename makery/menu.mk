@@ -1,2 +1,2 @@
--include .makery/kitchen/headchef/menu.mk
+-include .makery/headchef/menu.mk
 help:: menu
