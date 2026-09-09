@@ -98,13 +98,7 @@ H_SAY "+ Hidden: $line"
     done < "$STATION_DIR/workbench/.countertop"
 fi
 
-# --- 4. Auto-stash (if this project has already gone shady) ---
-if [ -L "__stash__" ]; then
-H_SAY "This project is already shady — stashing the new cook's contraband too..."
-    bash "$KITCHEN_ROOT/headchef/orders/shady.sh"
-fi
-
-# --- 5. Setup Script ---
+# --- 4. Setup Script ---
 # The countertop is untouchable: whatever this station's .countertop
 # already claims locally (including a dangling symlink - the name is
 # still claimed even if its target isn't there yet) gets snapshotted
@@ -144,6 +138,15 @@ if [ -f "$STATION_DIR/cook/contract/hired.sh" ]; then
         mv "$COUNTERTOP_BACKUP/$path" "$path"
     done
     rm -rf "$COUNTERTOP_BACKUP"
+fi
+
+# --- 5. Auto-stash (if this project has already gone shady) ---
+# Runs after hired.sh so the new station has real content to stash and
+# illegal.sh (if any) has real content to react to, instead of a bare
+# station directory with nothing built yet.
+if [ -L "__stash__" ]; then
+H_SAY "This project is already shady — stashing the new cook's contraband too..."
+    bash "$KITCHEN_ROOT/headchef/orders/shady.sh"
 fi
 
 H_FINISHED
