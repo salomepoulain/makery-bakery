@@ -48,10 +48,12 @@ call::
 		fi; \
 		H_FINISHED'
 
-# Build station menus dynamically (append after headchef menu)
+# Build station menus dynamically (append after headchef menu). A station
+# without a single ITEM line has no commands, so it gets no empty menu.
 menu::
 	@for station_dir in .makery/stations/*/; do \
 		[ "$$(basename "$$station_dir")" = "_empty_station" ] && continue; \
+		grep -Eq '^[[:space:]]*ITEM ' "$$station_dir/menu.mk" 2>/dev/null || continue; \
 		[ -d "$$station_dir" ] && [ -f "$$station_dir/menu.mk" ] && $(MAKE) -f "$$station_dir/menu.mk" menu || true; \
 	done
 
