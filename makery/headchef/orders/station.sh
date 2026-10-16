@@ -2,7 +2,7 @@
 # ============================================================================
 #  HEAD CHEF: STATION SCAFFOLDER
 # ============================================================================
-# Scaffolds a new station from the official template
+# Scaffolds a new station from the kitchen's own _empty_station template
 # Usage: ./station.sh <name>
 
 set -e
@@ -32,6 +32,12 @@ if [[ -z "$1" ]]; then
 fi
 
 STATION_NAME="$1"
+case "$STATION_NAME" in
+    */* | . | .. | _empty_station)
+        H_SAY "Error: '$STATION_NAME' isn't a usable station name"
+        exit 1
+        ;;
+esac
 REPO_ROOT=$(find_project_root) || {
     H_SAY "Error: .makery folder not found"
     exit 1
@@ -45,48 +51,13 @@ if [[ -d "$STATION_DIR" ]]; then
     exit 1
 fi
 
-H_SAY "Fetching template from salomepoulain/makery-bakery..."
-
-# Use GitHub API to get the file tree structure
-TREE_DATA=$(gh api repos/salomepoulain/makery-bakery/git/trees/HEAD?recursive=1 --jq '.tree[] | select(.path | startswith("makery/stations/_empty_station/"))' 2>/dev/null) || {
-    H_SAY "Error: failed to fetch template tree from GitHub"
-    H_SAY "Make sure you're authenticated: gh auth login"
+# The template ships with every kitchen, so this works offline and without gh.
+TEMPLATE_DIR="$REPO_ROOT/.makery/stations/_empty_station"
+if [[ ! -d "$TEMPLATE_DIR" ]]; then
+    H_SAY "Error: template not found at $TEMPLATE_DIR"
     exit 1
-}
-
-# Create station directory
-mkdir -p "$STATION_DIR"
-
-# Download each file from the template
-while IFS= read -r line; do
-    if [[ -z "$line" ]]; then
-        continue
-    fi
-
-    # Parse the JSON line
-    FILE_PATH=$(echo "$line" | jq -r '.path')
-    FILE_TYPE=$(echo "$line" | jq -r '.type')
-
-    # Strip "makery/stations/_empty_station/" prefix
-    RELATIVE_PATH="${FILE_PATH#makery/stations/_empty_station/}"
-
-    if [[ "$FILE_TYPE" == "blob" ]]; then
-        TARGET_PATH="$STATION_DIR/$RELATIVE_PATH"
-        TARGET_DIR=$(dirname "$TARGET_PATH")
-
-        # Create parent directories
-        mkdir -p "$TARGET_DIR"
-
-        # Download file content from GitHub
-        gh api repos/salomepoulain/makery-bakery/contents/"$FILE_PATH" --jq '.content' | base64 -d > "$TARGET_PATH" 2>/dev/null || {
-            H_SAY "Error: failed to download $FILE_PATH"
-            exit 1
-        }
-    elif [[ "$FILE_TYPE" == "tree" ]]; then
-        # Create directory
-        mkdir -p "$STATION_DIR/$RELATIVE_PATH"
-    fi
-done <<< "$TREE_DATA"
+fi
+cp -R "$TEMPLATE_DIR" "$STATION_DIR"
 
 # Make scripts executable
 find "$STATION_DIR" -name "*.sh" -type f -exec chmod +x {} \;
@@ -98,6 +69,8 @@ H_SAY "  1. Edit cook/personality.sh to customize COOK_NAME, COOK_ICON, COOK_COL
 H_SAY "  2. Edit workbench/.tools if your station needs system dependencies"
 H_SAY "  3. Edit cook/contract/hired.sh to add setup steps (e.g., create venv)"
 H_SAY "  4. Edit cook/skills/ to add your station's skills"
-H_SAY "  5. Run 'bake first $STATION_NAME' to hire the station"
+H_SAY "  5. Hire it here with 'bake first $STATION_NAME' (runs hired.sh)"
+H_SAY "  6. Try a command with 'bake $STATION_NAME <command>'"
+H_SAY "  7. Send it to your registry with 'bake request'"
 
 H_FINISHED

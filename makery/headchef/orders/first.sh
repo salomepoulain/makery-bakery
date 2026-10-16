@@ -8,61 +8,84 @@ source "$(dirname "${BASH_SOURCE[0]}")/../personality.sh"
 
 # --- validation ---
 STATION_NAME="$1"
-[ -z "$STATION_NAME" ] && H_SAY "Usage: bake first <station_name>"
+if [ -z "$STATION_NAME" ]; then
+    H_SAY "Usage: bake first <station_name>"
+    exit 1
+fi
+case "$STATION_NAME" in
+    */* | . | .. | _empty_station)
+        H_SAY "'$STATION_NAME' isn't a station you can hire."
+        exit 1
+        ;;
+esac
 
 KITCHEN_ROOT="$(dirname "${BASH_SOURCE[0]}")/../.."
 STATION_DIR="$KITCHEN_ROOT/stations/$STATION_NAME"
-STATIONS_REPO="${MAKERY_REGISTRY:-https://github.com/salomepoulain/makery-stations}"
+# shellcheck source=../registry.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../registry.sh"
+STATIONS_REPO="$REGISTRY_URL"
 
 H_STARTER "HIRING COOK & OPENING STATION: $STATION_NAME"
 
-# --- Interactive Replacement Check ---
-if [ -d "$STATION_DIR" ]; then
-    echo -ne "  ${YELLOW}⚠${NC} The '$STATION_NAME' cook is already at their station. Replace them? (y/N): "
+# --- Look in the registry first ---
+H_SAY "Looking for '$STATION_NAME' in the Registry..."
+TMP_DIR=$(mktemp -d)
+IN_REGISTRY=0
+if git clone --depth 1 --filter=blob:none --sparse "$STATIONS_REPO" "$TMP_DIR" > /dev/null 2>&1; then
+    git -C "$TMP_DIR" sparse-checkout set "stations/$STATION_NAME" > /dev/null 2>&1
+    [ -d "$TMP_DIR/stations/$STATION_NAME" ] && IN_REGISTRY=1
+else
+    H_SAY "Couldn't reach the Registry ($MAKERY_REGISTRY)."
+fi
+
+# FROM_REGISTRY=1: the station folder below is a fresh registry copy, safe to
+# remove again. 0: it's the project's own local station, never removed here.
+FROM_REGISTRY=0
+if [ "$IN_REGISTRY" -eq 1 ] && [ -d "$STATION_DIR" ]; then
+    echo -ne "  ${YELLOW}⚠${NC} The '$STATION_NAME' cook is already at their station. Replace them with the Registry's version? (y/N): "
     read -r response
-    if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-        status "Firing the current cook and clearing the station..."
-        rm -rf "$STATION_DIR"
-    else
-H_SAY "Keeping the current cook. No changes made."
+    if [[ ! "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+        rm -rf "$TMP_DIR"
+        H_SAY "Keeping the current cook. No changes made."
         exit 0
     fi
+    H_SAY "Firing the current cook and clearing the station..."
+    rm -rf "$STATION_DIR"
 fi
 
-# --- Fetching ---
-H_SAY "Fetching '$STATION_NAME' from the Registry..."
-TMP_DIR=$(mktemp -d)
-git clone --depth 1 --filter=blob:none --sparse "$STATIONS_REPO" "$TMP_DIR" > /dev/null 2>&1 || H_SAY "Failed to contact Registry."
-
-cd "$TMP_DIR" || exit 1
-git sparse-checkout set "stations/$STATION_NAME" > /dev/null 2>&1
-
-if [ ! -d "stations/$STATION_NAME" ]; then
-    cd - > /dev/null || exit
+if [ "$IN_REGISTRY" -eq 1 ]; then
+    mkdir -p "$KITCHEN_ROOT/stations"
+    mv "$TMP_DIR/stations/$STATION_NAME" "$KITCHEN_ROOT/stations/"
+    FROM_REGISTRY=1
+    H_SAY "The new cook has arrived."
+elif [ -d "$STATION_DIR" ]; then
+    # Made here with `bake station`, not sent with `bake request` yet.
+    H_SAY "'$STATION_NAME' isn't in the Registry, hiring your local station."
+else
     rm -rf "$TMP_DIR"
-H_SAY "The '$STATION_NAME' station doesn't exist in the Registry."
+    H_SAY "The '$STATION_NAME' station doesn't exist in the Registry or in this project."
+    exit 1
 fi
-
-cd - > /dev/null || exit
-mkdir -p "$KITCHEN_ROOT/stations"
-mv "$TMP_DIR/stations/$STATION_NAME" "$KITCHEN_ROOT/stations/"
 rm -rf "$TMP_DIR"
-
-H_SAY "The new cook has arrived."
 
 # --- 1. Dependencies ---
 if [ -f "$STATION_DIR/workbench/.tools" ]; then
-H_SAY "Checking personal tools..."
+    H_SAY "Checking personal tools..."
+    MISSING=0
     while IFS= read -r dep || [ -n "$dep" ]; do
         [[ -z "$dep" || "$dep" == "#"* ]] && continue
         if ! command -v "$dep" &> /dev/null; then
-H_SAY "✗ Missing: $dep"
-            rm -rf "$STATION_DIR"
-H_SAY "Missing essential tools. Station setup aborted."
+            H_SAY "✗ Missing: $dep"
+            MISSING=1
         else
-H_SAY "✓ Found: $dep"
+            H_SAY "✓ Found: $dep"
         fi
     done < "$STATION_DIR/workbench/.tools"
+    if [ "$MISSING" -eq 1 ]; then
+        [ "$FROM_REGISTRY" -eq 1 ] && rm -rf "$STATION_DIR"
+        H_SAY "Missing essential tools. Station setup aborted."
+        exit 1
+    fi
 fi
 
 # --- 2. Pantry (Static files) ---
@@ -109,6 +132,21 @@ if [ -f "$STATION_DIR/cook/contract/hired.sh" ]; then
     COUNTERTOP_BACKUP=$(mktemp -d)
     COUNTERTOP_PROTECTED=()
 
+    # Put everything back, also when hiring gets interrupted (Ctrl-C):
+    # otherwise .env, .claude and friends stay stuck in a temp folder.
+    restore_countertop() {
+        local path
+        for path in "${COUNTERTOP_PROTECTED[@]}"; do
+            [ -e "$COUNTERTOP_BACKUP/$path" ] || [ -L "$COUNTERTOP_BACKUP/$path" ] || continue
+            rm -rf "$path"
+            mkdir -p "$(dirname "$path")"
+            mv "$COUNTERTOP_BACKUP/$path" "$path"
+        done
+        rm -rf "$COUNTERTOP_BACKUP"
+    }
+    trap restore_countertop EXIT
+    trap 'restore_countertop; exit 130' INT TERM
+
     if [ -f "$STATION_DIR/workbench/.countertop" ]; then
         while IFS= read -r path || [ -n "$path" ]; do
             [[ -z "$path" || "$path" == "#"* ]] && continue
@@ -132,12 +170,8 @@ if [ -f "$STATION_DIR/cook/contract/hired.sh" ]; then
 
     bash "$STATION_DIR/cook/contract/hired.sh"
 
-    for path in "${COUNTERTOP_PROTECTED[@]}"; do
-        rm -rf "$path"
-        mkdir -p "$(dirname "$path")"
-        mv "$COUNTERTOP_BACKUP/$path" "$path"
-    done
-    rm -rf "$COUNTERTOP_BACKUP"
+    restore_countertop
+    trap - EXIT INT TERM
 fi
 
 # --- 5. Auto-stash (if this project has already gone shady) ---
