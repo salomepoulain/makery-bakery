@@ -294,7 +294,7 @@ Each Station needs:
 To add a Station:
 1. Follow the Station template.
 2. Run `bake request` to open a PR against `salomepoulain/makery-stations` with your local Station updates.
-3. For changes to the Head Chef itself, `bake request` opens the equivalent PR against this repo.
+3. `bake request` only syncs Stations. Change the Head Chef by committing to this repo directly.
 
 Merging sync PRs (`bake in`) and cutting releases (`bake release`) require maintain/admin rights on both repos and are restricted to the project owner. Neither shows up in `bake menu` or [Core commands](#core-commands): they're maintenance operations on this repo and the registry, not something a Station user or author ever runs.
 
