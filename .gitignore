@@ -33,7 +33,7 @@ htmlcov/
 .claude/
 .git/
 
-CLAUDE.md
+/CLAUDE.md
 settings.local.json
 .claude
 .claude-free
