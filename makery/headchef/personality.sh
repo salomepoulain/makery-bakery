@@ -63,7 +63,7 @@ _term_cols() {
     # and station menus don't each start stty again for every line.
     if [[ -z "${MAKERY_COLS:-}" ]]; then
         local size
-        size=$(stty size 2>/dev/null)
+        size=$(stty size 2>/dev/null) || size="" # no terminal: fall back to 80, and don't trip set -e
         MAKERY_COLS=${size##* }
         [[ "$MAKERY_COLS" =~ ^[0-9]+$ ]] || MAKERY_COLS=80
         export MAKERY_COLS
