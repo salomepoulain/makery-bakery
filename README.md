@@ -103,6 +103,8 @@ make burnt s=python        # Fire the python station
 - `bake in`: review the PRs on your registry file by file, merge what you accept, and update this project's hired Stations. Needs maintain/admin rights on the registry.
 - `bake all`: fire every Station and delete the entire project directory, not just `.makery`. Only what already went shady survives. See the warning under [The kitchen, as a set of nested regions](#the-kitchen-as-a-set-of-nested-regions).
 
+Output scrolls in one line at a time on a terminal. Set `MAKERY_LINE_DELAY` to the pause per line in seconds, for example `export MAKERY_LINE_DELAY=0.01` in your `~/.zshrc` for slower or `0` for instant. Logs and pipes always get the output at full speed.
+
 `bake` routes commands automatically: core operations take a Station name directly (`bake first python`), while a Station's own skills go through `call` (`bake python test` → `make call s=python d=test`).
 
 ## Security and reproducibility

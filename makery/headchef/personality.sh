@@ -77,6 +77,19 @@ _rule_into() {
     printf -v "$1" '%s' "${!1// /$2}"
 }
 
+# A short pause after each printed line, so output scrolls in line by line.
+# MAKERY_LINE_DELAY is seconds per line (0 turns it off). Only on a terminal:
+# logs, pipes and agents get the output at full speed. bash's built-in sleep
+# (where it exists) keeps the pause exactly as long as asked; otherwise the
+# sleep program is used, which adds a few milliseconds.
+enable -f sleep sleep 2>/dev/null || true
+_pace() {
+    [[ -t 1 ]] || return 0
+    local d="${MAKERY_LINE_DELAY:-0.005}"
+    [[ "$d" == 0 || "$d" == 0.0 ]] && return 0
+    sleep "$d"
+}
+
 # --- Head Chef Functions ---
 H_STARTER() {
     local rule rule_thin
@@ -86,6 +99,7 @@ H_STARTER() {
     echo -e "${HC_COLOR}${rule}${NC}"
     echo -e "${HC_COLOR}  $1${NC}"
     echo -e "${HC_COLOR}${rule_thin}${NC}"
+    _pace
 }
 
 H_FINISHED() {
@@ -104,6 +118,7 @@ H_LINE() {
     _term_cols >/dev/null
     _rule_into rule "☰"
     echo -e "${HC_COLOR}${rule}${NC}"
+    _pace
 }
 
 H_SAY() {
@@ -120,6 +135,7 @@ H_SAY() {
     # Most messages fit on one line: print them straight away, no fold.
     if (( ${#1} <= msg_width )) && [[ "$1" != *$'\n'* ]]; then
         echo -e "  ${HC_COLOR}${HC_ICON} $HC_NAME:${NC}${spaces} ${ITALIC}${DIM}${1}${NC}"
+        _pace
         return
     fi
 
@@ -133,6 +149,7 @@ H_SAY() {
             echo -e "${cont_indent}${ITALIC}${DIM}${line}${NC}"
         fi
     done
+    _pace
 }
 
 ITEM() {
@@ -146,6 +163,7 @@ ITEM() {
     # Most descriptions fit on one line: print them straight away, no fold.
     if (( ${#2} <= desc_width )); then
         printf "  %-${cmd_width}s  %s\n" "$1" "$2"
+        _pace
         return
     fi
 
@@ -161,4 +179,5 @@ ITEM() {
             printf "%s  %s\n" "$cont_indent" "$desc_line"
         fi
     done <<< "$(printf '%s' "$2" | fold -sw "$desc_width")"
+    _pace
 }
