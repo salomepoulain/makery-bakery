@@ -302,6 +302,14 @@ if [ $# -eq 0 ]; then
     _bake_logo
 fi
 
+# Measure the terminal once and hand it to every order and station menu, so
+# they don't each start stty again for every line they print.
+if [ -z "${MAKERY_COLS:-}" ]; then
+    _bake_size=$(stty size 2>/dev/null)
+    MAKERY_COLS=${_bake_size##* }
+    if [[ "$MAKERY_COLS" =~ ^[0-9]+$ ]]; then export MAKERY_COLS; else unset MAKERY_COLS; fi
+fi
+
 # Route to make. _empty_station is excluded from single-station auto-routing.
 if [ $# -ge 2 ] && [[ ! "$2" == *=* ]]; then
     _bake_first="$1"; _bake_second="$2"; shift 2

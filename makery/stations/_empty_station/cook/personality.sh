@@ -58,23 +58,42 @@ _calc_hc_id_visible_len() {
 
 # --- Helpers ---
 _term_cols() {
-    local cols
-    cols=$(stty size 2>/dev/null | awk '{print $2}')
-    [[ "$cols" =~ ^[0-9]+$ ]] && echo "$cols" || echo 80
+    # Measured once, then reused: MAKERY_COLS is exported, so nested orders
+    # and station menus don't each start stty again for every line.
+    if [[ -z "${MAKERY_COLS:-}" ]]; then
+        local size
+        size=$(stty size 2>/dev/null)
+        MAKERY_COLS=${size##* }
+        [[ "$MAKERY_COLS" =~ ^[0-9]+$ ]] || MAKERY_COLS=80
+        export MAKERY_COLS
+    fi
+    echo "$MAKERY_COLS"
+}
+
+# Put a full-width line of character $2 into variable $1 (bash only, no awk).
+_rule_into() {
+    printf -v "$1" '%*s' "$MAKERY_COLS" ''
+    printf -v "$1" '%s' "${!1// /$2}"
 }
 
 SAY() {
     local cols msg_width msg_start_col pad spaces cont_indent id_visible_len
-    cols=$(_term_cols)
-    id_visible_len=$(_calc_hc_id_visible_len)
+    _term_cols >/dev/null; cols=$MAKERY_COLS
+    id_visible_len=$(( ${#COOK_ICON} + ${#COOK_NAME} + 1 + ${_HC_ID_VISIBLE_OFFSET:-0} ))
     msg_start_col=$(( _HC_PREFIX_WIDTH + 3 ))
     msg_width=$(( cols - msg_start_col ))
     [[ "$msg_width" -lt 20 ]] && msg_width=20
 
     pad=$(( _HC_PREFIX_WIDTH - id_visible_len ))
-    spaces=$(printf '%*s' "$pad" '')
-    cont_indent=$(printf '%*s' "$msg_start_col" '')
+    printf -v spaces '%*s' "$pad" ''
 
+    # Most messages fit on one line: print them straight away, no fold.
+    if (( ${#1} <= msg_width )) && [[ "$1" != *$'\n'* ]]; then
+        echo -e "  ${COOK_COLOR}${COOK_ICON} $COOK_NAME:${NC}${spaces} ${ITALIC}${DIM}${1}${NC}"
+        return
+    fi
+
+    printf -v cont_indent '%*s' "$msg_start_col" ''
     local first=1
     echo "$1" | fold -sw "$msg_width" | while IFS= read -r line; do
         if [[ "$first" -eq 1 ]]; then
@@ -88,14 +107,20 @@ SAY() {
 
 ITEM() {
     local cols cmd_width msg_start_col desc_width
-    cols=$(_term_cols)
+    _term_cols >/dev/null; cols=$MAKERY_COLS
     cmd_width=28
     msg_start_col=$(( 4 + cmd_width + 2 ))
     desc_width=$(( cols - msg_start_col ))
     [[ "$desc_width" -lt 10 ]] && desc_width=10
 
+    # Most descriptions fit on one line: print them straight away, no fold.
+    if (( ${#2} <= desc_width )); then
+        printf "  %-${cmd_width}s  %s\n" "$1" "$2"
+        return
+    fi
+
     local cont_indent
-    cont_indent=$(printf '%*s' "$msg_start_col" '')
+    printf -v cont_indent '%*s' "$msg_start_col" ''
 
     local desc_line first=1
     while IFS= read -r desc_line; do
@@ -109,28 +134,28 @@ ITEM() {
 }
 
 STARTER() {
-    local rule cols
-    cols=$(_term_cols)
-    rule=$(awk -v n="$cols" 'BEGIN{while(i++<n)printf"━";print""}')
-    rule_thin=$(awk -v n="$cols" 'BEGIN{while(i++<n)printf"—";print""}')
+    local rule rule_thin
+    _term_cols >/dev/null
+    _rule_into rule "━"
+    _rule_into rule_thin "—"
     echo -e "${COOK_COLOR}${rule}${NC}"
     echo -e "${COOK_COLOR}  $1${NC}"
     echo -e "${COOK_COLOR}${rule_thin}${NC}"
 }
 
 FINISHED() {
-    local rule cols
-    cols=$(_term_cols)
-    rule=$(awk -v n="$cols" 'BEGIN{while(i++<n)printf"━";print""}')
-    rule_thin=$(awk -v n="$cols" 'BEGIN{while(i++<n)printf"—";print""}')
+    local rule rule_thin
+    _term_cols >/dev/null
+    _rule_into rule "━"
+    _rule_into rule_thin "—"
     echo -e "${COOK_COLOR}${rule_thin}${NC}"
     echo -e "${COOK_COLOR}  BAKE FINISHED${NC}"
     echo -e "${COOK_COLOR}${rule}${NC}"
 }
 
 LINE() {
-    local rule cols
-    cols=$(_term_cols)
-    rule=$(awk -v n="$cols" 'BEGIN{while(i++<n)printf"━";print""}')
-    echo -e "${COOK_COLOR}${rule}${NC}" 
+    local rule
+    _term_cols >/dev/null
+    _rule_into rule "━"
+    echo -e "${COOK_COLOR}${rule}${NC}"
 }
