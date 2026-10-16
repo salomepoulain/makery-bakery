@@ -12,11 +12,13 @@
 - [Getting started](#getting-started)
 - [Core commands](#core-commands)
 - [Security and reproducibility](#security-and-reproducibility)
+- [Stations run code, and agents can run bake](#stations-run-code-and-agents-can-run-bake)
 - [The kitchen, as a set of nested regions](#the-kitchen-as-a-set-of-nested-regions)
 - [Going shady](#going-shady)
 - [Bake vs. make](#bake-vs-make)
 - [Station structure](#station-structure)
 - [Creating new stations](#creating-new-stations)
+- [Using your own registry](#using-your-own-registry)
 - [Contributing](#contributing)
 - [Development setup](#development-setup)
 
@@ -90,13 +92,15 @@ make burnt s=python        # Fire the python station
 ## Core commands
 
 - `bake`: show the menu (bootstraps `.makery/` on first use in a project).
+- `bake update`: update `bake` to the latest release. Inside a project it also refreshes the kitchen (`headchef/`, the Station template and `AGENTS.md`) and keeps your hired Stations as they are.
 - `bake inspo`: list Stations available in the registry.
 - `bake first <name>`: hire a Station and run its onboarding.
 - `bake burnt <name>` / `bake last <name>`: fire a Station and undo its leftovers. `last` is a plain-language alias, same command either way.
 - `bake germs [name]` / `bake clean [name]`: scrub a Station's dishsoap mess, or every hired Station's if no name is given. `clean` is the plain-language alias for `germs`.
 - `bake station <name>`: scaffold a new Station from the `_empty_station` template.
 - `bake shady [path]`: no path stashes every hired Station's contraband; a path stashes just that one thing.
-- `bake request`: open a PR with your local Station updates against the registry.
+- `bake request`: send your local Station changes as a PR to the registry. If you can't write to it, `bake request` forks it for you and opens the PR from your fork.
+- `bake in`: review the PRs on your registry file by file, merge what you accept, and update this project's hired Stations. Needs maintain/admin rights on the registry.
 - `bake all`: fire every Station and delete the entire project directory, not just `.makery`. Only what already went shady survives. See the warning under [The kitchen, as a set of nested regions](#the-kitchen-as-a-set-of-nested-regions).
 
 `bake` routes commands automatically: core operations take a Station name directly (`bake first python`), while a Station's own skills go through `call` (`bake python test` → `make call s=python d=test`).
@@ -124,6 +128,36 @@ sha256sum -c makery-bakery-$TAG.tar.gz.sha256
 ```
 
 Releases are date-versioned and published directly by the maintainer with `bake release`, no CI workflow is involved: it tags `main`, builds the tarball and checksum from `makery/`, and pushes a GitHub Release with all three assets in one step.
+
+## Stations run code, and agents can run bake
+
+Use makery-bakery at your own risk. It's MIT licensed, comes without any warranty, and runs shell scripts on your machine with your permissions.
+
+**Hiring runs someone else's script.** `bake first <name>` downloads a Station from the registry and runs its `hired.sh` straight away. That script can install software and change any file your user can change. `bake burnt` runs the Station's `fired.sh`, and every Station command is a script too. Only hire Stations from a registry you trust, and read a Station on GitHub before you hire it: `cook/contract/hired.sh` first, then the scripts in `cook/skills/`. The default registry is mine, and I make no promises about what it does on your machine.
+
+**Agents can run bake too.** If you let a coding agent use your shell, it can run `bake` just like you. Agent rules usually look at the command itself, like "no `git push`". A Station command that pushes inside its own script slips past such a rule, for example `bake claude commit-yolo`.
+
+What makery-bakery does about it:
+
+- `bake all` and `bake burnt` only run from a real terminal, and `bake all` makes you type the project name. An agent's command, or `echo y | bake all`, gets refused.
+- Every kitchen ships `.makery/AGENTS.md`, which tells agents which commands they must never run.
+
+That's where it stops. makery can't be a stronger lock than your agent's own permissions: an agent that can run `bake` can also run `rm -rf`, or fake a terminal. So deny the commands you don't want an agent to run in the agent's own settings. In Claude Code, for example:
+
+```json
+"permissions": {
+  "deny": ["Bash(bake all:*)", "Bash(bake burnt:*)", "Bash(bake request:*)", "Bash(bake in:*)", "Bash(bake claude commit-yolo:*)"]
+}
+```
+
+**Writing a Station?** A command that pushes, publishes, merges or deletes should refuse to run without a person at the keyboard, the same way `bake burnt` does:
+
+```bash
+if [ ! -t 0 ] || [ ! -t 1 ]; then
+    SAY "This needs a person at a real terminal. Nothing was changed."
+    exit 1
+fi
+```
 
 ## The kitchen, as a set of nested regions
 
@@ -257,7 +291,7 @@ Published reference: `salomepoulain/makery-stations`.
 
 ## Creating new stations
 
-Stations live in a registry, `salomepoulain/makery-stations` by default. Run `bake station <name>` to scaffold one from `.makery/stations/_empty_station`, this shells out to the GitHub API and needs `gh auth login`.
+Stations live in a registry, `salomepoulain/makery-stations` by default (see [Using your own registry](#using-your-own-registry)). Run `bake station <name>` to scaffold one. It copies `.makery/stations/_empty_station`, so it works offline.
 
 ### Writing a Station's `menu.mk`
 
@@ -289,14 +323,39 @@ Each Station needs:
 - `cook/personality.sh` with the Station's icon, name, and color,
 - `workbench/.countertop`, `.dishsoap`, and `.contraband`.
 
+### Working on Stations with an agent
+
+Every kitchen ships with `.makery/AGENTS.md` (and a `CLAUDE.md` that loads it), so a coding agent
+like Claude Code or Codex knows what it's looking at as soon as it works in `.makery/`. The file
+explains the station layout and tells the agent to run existing commands like
+`bake <station> <command>` instead of redoing them by hand, and to leave `__stash__` links alone.
+
+That makes it a good partner for creating or updating a Station. Ask it to add a skill, fix a
+`hired.sh`, or fill in a workbench file, and it edits the copy in `.makery/stations/<name>/`.
+When it notices setup that isn't specific to your project, like a conda environment you'd want
+again next time, it suggests turning it into a station command at the end of the task. It never
+sends anything to the registry itself. You check the change and run `bake request`.
+
+## Using your own registry
+
+A registry is any git repo with a `stations/<name>/` folder per Station. `bake inspo`, `bake first`, `bake request` and `bake in` all read it from `MAKERY_REGISTRY`, which defaults to `salomepoulain/makery-stations`.
+
+To use your own, make a repo with a `stations/` folder, or fork `makery-stations` to start from its Stations. Then add this to your `~/.zshrc`:
+
+```sh
+export MAKERY_REGISTRY=<you>/<your-stations>
+```
+
+`bake request` then opens its pull requests on your repo, and `bake in` lets you review them file by file and merge them. Other people can send you Stations too: when they point `MAKERY_REGISTRY` at your repo and run `bake request`, it forks your repo for them and opens a PR on yours, which shows up in your `bake in`. Both need a GitHub `owner/repo` and `bake in` needs maintain/admin rights on it. `bake inspo` and `bake first` also accept a full git URL or a local path.
+
 ## Contributing
 
 To add a Station:
 1. Follow the Station template.
-2. Run `bake request` to open a PR against `salomepoulain/makery-stations` with your local Station updates.
-3. `bake request` only syncs Stations. Change the Head Chef by committing to this repo directly.
+2. Run `bake request` to open a PR with your local Station updates on your registry (`MAKERY_REGISTRY`).
+3. `bake request` only syncs Stations. Change the Head Chef with a pull request to this repo.
 
-Merging sync PRs (`bake in`) and cutting releases (`bake release`) require maintain/admin rights on both repos and are restricted to the project owner. Neither shows up in `bake menu` or [Core commands](#core-commands): they're maintenance operations on this repo and the registry, not something a Station user or author ever runs.
+`bake release` publishes a new version of makery-bakery itself. It's only for this repo's maintainers, so it doesn't show up in `bake menu` or [Core commands](#core-commands).
 
 ## Development setup
 

@@ -171,6 +171,25 @@ _bake_download_latest() {
     echo "$tmp"
 }
 
+_bake_refresh_kitchen() {
+    # Replace this project's kitchen with the one in tarball $1, keeping the
+    # stations it has hired. headchef/, the station template and the loose
+    # files belong to makery-bakery; every other station belongs to the project.
+    local new f
+    new=$(mktemp -d)
+    tar -xzf "$1" -C "$new" || { rm -rf "$new"; return 1; }
+    rm -rf .makery/headchef .makery/stations/_empty_station
+    cp -R "$new/headchef" .makery/headchef
+    mkdir -p .makery/stations
+    cp -R "$new/stations/_empty_station" .makery/stations/_empty_station
+    for f in "$new"/* "$new"/.[!.]*; do
+        [ -f "$f" ] && cp "$f" .makery/
+    done
+    rm -rf "$new"
+    chmod +x .makery/headchef/orders/*.sh 2>/dev/null
+    return 0
+}
+
 _bake_extract() {
     local src="" tmp="" _upgraded=0
     if _bake_check_upgrade; then
@@ -222,12 +241,8 @@ _bake_upgrade_check() {
         _LATEST_TAG="$latest"
         local tmp
         if tmp=$(_bake_download_latest); then
-            rm -rf .makery
-            mkdir -p .makery
-            tar -xzf "$tmp" -C .makery
+            _bake_refresh_kitchen "$tmp" && echo "Project .makery/ upgraded to $latest (stations kept)."
             rm -f "$tmp"
-            chmod +x .makery/headchef/orders/*.sh 2>/dev/null
-            echo "Project .makery/ upgraded to $latest."
         fi
     fi
 
@@ -239,11 +254,11 @@ _bake_upgrade_check() {
 }
 
 _bake_update() {
-    # Explicit self-update: always checks GitHub and installs the latest
-    # release, regardless of TTY or BAKE_NO_UPDATE_CHECK. Not project-scoped,
-    # so it runs before the .makery bootstrap below.
+    # Explicit update: always checks GitHub, regardless of TTY or
+    # BAKE_NO_UPDATE_CHECK. Inside a project it also refreshes the kitchen
+    # (keeping hired stations), then it updates the bake binary itself.
     echo "Checking for the latest bake release..."
-    local _curl_err latest
+    local _curl_err latest tmp
     _curl_err=$(mktemp)
     curl -fsSL "$_BAKE_REPO_API" -o "$_curl_err" 2>/dev/null
     latest=$(grep '"tag_name"' "$_curl_err" | sed 's/.*"tag_name": "\([^"]*\)".*/\1/')
@@ -251,6 +266,12 @@ _bake_update() {
     if [ -z "$latest" ]; then
         echo "Could not reach GitHub to check for updates." >&2
         return 1
+    fi
+    if [ -d .makery ]; then
+        _LATEST_TAG="$latest"
+        tmp=$(_bake_download_latest) || return 1
+        _bake_refresh_kitchen "$tmp" && echo "This project's kitchen is now $latest (stations kept)."
+        rm -f "$tmp"
     fi
     if [ "$latest" = "$BAKE_VERSION" ]; then
         echo "bake is already up to date ($BAKE_VERSION)."
