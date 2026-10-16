@@ -7,10 +7,22 @@
 source "$(dirname "${BASH_SOURCE[0]}")/../personality.sh"
 
 if [ -z "$1" ]; then
-    H_SAY "You didn't tell me which station to tear down."
+    H_SAY "You didn't tell me which station to tear down. Usage: bake burnt <name>"
+    exit 1
 fi
 
 STATION_NAME="$1"
+# An empty, dotted or nested name would point at stations/ or .makery itself.
+case "$STATION_NAME" in
+    */* | . | ..)
+        H_SAY "'$STATION_NAME' isn't a station name."
+        exit 1
+        ;;
+    _empty_station)
+        H_SAY "That's the template for new stations, not a cook. Leaving it."
+        exit 1
+        ;;
+esac
 KITCHEN_ROOT="$(dirname "${BASH_SOURCE[0]}")/../.."
 STATION_DIR="$KITCHEN_ROOT/stations/$STATION_NAME"
 
@@ -20,6 +32,19 @@ if [ ! -d "$STATION_DIR" ]; then
 fi
 
 H_STARTER "BAKING BURNT $STATION_NAME"
+
+# Firing runs fired.sh and deletes files, so it only runs from a real terminal,
+# never from an agent's command or a pipe like `echo y | bake burnt x`.
+if [ ! -t 0 ] || [ ! -t 1 ]; then
+    H_SAY "bake burnt deletes files, so it only runs from a real terminal. Nothing was changed."
+    exit 1
+fi
+echo -ne "  ${HC_COLOR}$HC_ICON${NC} Fire '$STATION_NAME'? This runs its fired.sh and deletes its dishsoap, countertop files and the station. (y/N) "
+read -r REPLY
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    H_SAY "The '$STATION_NAME' cook keeps their job. Nothing was changed."
+    exit 0
+fi
 
 # 1. The Teardown Script (System Purge)
 if [ -f "$STATION_DIR/cook/contract/fired.sh" ]; then
