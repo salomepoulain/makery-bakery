@@ -1,9 +1,11 @@
 #!/bin/bash
 # ============================================================================
-#  HEAD CHEF: ACCEPT (Merge PRs and create tarball from updated .makery)
+#  HEAD CHEF: ACCEPT (Review and merge sync PRs on your registry)
 # ============================================================================
-# Finds PRs with sync/ prefix, confirms each merge, and archives .makery
-# Usage: ./accept.sh
+# Finds open "Sync" PRs that `bake request` opened on MAKERY_REGISTRY (see
+# ../registry.sh), lets you accept or reject each file, merges, and updates
+# this project's hired stations. Needs admin/maintain rights on the registry.
+# Usage: bake in
 
 set -e
 
@@ -48,12 +50,14 @@ CURRENT_USER=$(gh api user --jq '.login' 2>/dev/null) || {
     exit 1
 }
 
-# Config
-STATIONS_REPO="salomepoulain/makery-stations"
-MULTI_REPO="salomepoulain/makery-bakery"
-REPO_OWNER="salomepoulain"
+# shellcheck source=../registry.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../registry.sh"
+if [ "$REGISTRY_URL" != "https://github.com/$MAKERY_REGISTRY" ]; then
+    H_SAY "Error: bake in merges pull requests on GitHub, so MAKERY_REGISTRY must be owner/repo (now: $MAKERY_REGISTRY)"
+    exit 1
+fi
+STATIONS_REPO="$MAKERY_REGISTRY"
 
-# Check permissions for stations repo
 PERM=$(gh repo view "$STATIONS_REPO" --json viewerPermission --jq '.viewerPermission' 2>/dev/null) || {
     H_SAY "Error: cannot access repo $STATIONS_REPO (check permissions and authentication)"
     exit 1
@@ -63,27 +67,12 @@ case "$PERM" in
     ADMIN|MAINTAIN) ;;
     *)
         H_SAY "Error: you ($CURRENT_USER) do not have admin/maintain rights on $STATIONS_REPO"
-        H_SAY "Only $REPO_OWNER can bake in changes. Contact the repo owner."
+        H_SAY "Only the registry's maintainers can bake in changes. To run your own, see 'Using your own registry' in the makery-bakery README."
         exit 1
         ;;
 esac
 
-# Check permissions for headchef/multi repo
-PERM=$(gh repo view "$MULTI_REPO" --json viewerPermission --jq '.viewerPermission' 2>/dev/null) || {
-    H_SAY "Error: cannot access repo $MULTI_REPO (check permissions and authentication)"
-    exit 1
-}
-
-case "$PERM" in
-    ADMIN|MAINTAIN) ;;
-    *)
-        H_SAY "Error: you ($CURRENT_USER) do not have admin/maintain rights on $MULTI_REPO"
-        H_SAY "Only $REPO_OWNER can bake in changes. Contact the repo owner."
-        exit 1
-        ;;
-esac
-
-H_SAY "✓ Authorized as $CURRENT_USER (owner)"
+H_SAY "✓ Authorized as $CURRENT_USER on $STATIONS_REPO"
 
 # Track partial acceptances
 declare -A PARTIAL_REPOS
@@ -285,7 +274,8 @@ process_repo() {
         H_LINE
 
         # Review each file individually
-        declare -a accepted_files rejected_files
+        # Start empty for every PR, or one PR's choices leak into the next.
+        local -a accepted_files=() rejected_files=()
         local file_idx=0
         local total_files
         total_files=$(echo "$CHANGED_FILES" | grep -c .)
@@ -348,6 +338,11 @@ process_repo() {
 
             SYNC_BRANCH=$(gh pr view "$pr_num" --repo "$repo_name" --json headRefName --jq '.headRefName' 2>/dev/null)
             [ -z "$SYNC_BRANCH" ] && { H_SAY "Error: cannot determine PR branch"; continue; }
+            # A PR from someone's fork lives in their fork, so the trimmed
+            # branch has to go there (GitHub lets maintainers push to it).
+            HEAD_REPO=$(gh pr view "$pr_num" --repo "$repo_name" --json headRepositoryOwner,headRepository \
+                --jq '.headRepositoryOwner.login + "/" + .headRepository.name' 2>/dev/null)
+            [ -z "$HEAD_REPO" ] || [ "$HEAD_REPO" = "/" ] && HEAD_REPO="$repo_name"
 
             # Restore rejected files to base state
             for rejected_f in "${rejected_files[@]}"; do
@@ -359,8 +354,8 @@ process_repo() {
             git -C "$PR_WORK" add -A
             if ! git -C "$PR_WORK" diff --cached --quiet; then
                 git -C "$PR_WORK" commit -m "Sync partial ($accepted_count/$total_files files accepted)" 2>/dev/null
-                git -C "$PR_WORK" push --force-with-lease origin "pr-$pr_num:$SYNC_BRANCH" 2>/dev/null \
-                    || { H_SAY "Error: push failed"; continue; }
+                git -C "$PR_WORK" push --force "https://github.com/$HEAD_REPO.git" "pr-$pr_num:$SYNC_BRANCH" 2>/dev/null \
+                    || { H_SAY "Error: couldn't update the PR branch on $HEAD_REPO (did they turn off 'Allow edits by maintainers'?). Skipping."; continue; }
             fi
 
             # Merge the rewritten PR
@@ -388,9 +383,6 @@ TOTAL_MERGED=0
 process_repo "$STATIONS_REPO" "stations" || STATIONS_MERGED=$?
 TOTAL_MERGED=$((TOTAL_MERGED + STATIONS_MERGED))
 
-process_repo "$MULTI_REPO" "headchef" || HEADCHEF_MERGED=$?
-TOTAL_MERGED=$((TOTAL_MERGED + HEADCHEF_MERGED))
-
 # ============================================================================
 # PULL MERGED CHANGES
 # ============================================================================
@@ -403,8 +395,7 @@ if [ "$TOTAL_MERGED" -gt 0 ]; then
     mkdir -p "$TEMP_DIR"
     trap 'rm -rf "$TEMP_DIR"' EXIT
 
-    git clone --depth 1 --quiet "https://github.com/$STATIONS_REPO" "$TEMP_DIR/stations" 2>/dev/null || { H_SAY "Failed to clone makery-stations"; exit 1; }
-    git clone --depth 1 --quiet "https://github.com/$MULTI_REPO" "$TEMP_DIR/multi" 2>/dev/null || { H_SAY "Failed to clone makery-bakery"; exit 1; }
+    git clone --depth 1 --quiet "$REGISTRY_URL" "$TEMP_DIR/stations" 2>/dev/null || { H_SAY "Failed to clone $STATIONS_REPO"; exit 1; }
 
     # Update local stations — only ones already hired in this project.
     # Registry stations that aren't hired here are left alone.
@@ -413,16 +404,19 @@ if [ "$TOTAL_MERGED" -gt 0 ]; then
         # Partial merge: copy only accepted files, for hired stations only
         while IFS= read -r f; do
             [ -z "$f" ] && continue
-            station_name="${f%%/*}"
+            rel="${f#stations/}" # accepted paths are relative to the registry root
+            station_name="${rel%%/*}"
+            [ "$station_name" = "_empty_station" ] && continue # the template comes with makery-bakery
             [ -d "$REPO_ROOT/.makery/stations/$station_name" ] || continue
-            mkdir -p "$REPO_ROOT/.makery/stations/$(dirname "$f")"
-            cp "$TEMP_DIR/stations/stations/$f" "$REPO_ROOT/.makery/stations/$f" 2>/dev/null || true
+            mkdir -p "$REPO_ROOT/.makery/stations/$(dirname "$rel")"
+            cp "$TEMP_DIR/stations/$f" "$REPO_ROOT/.makery/stations/$rel" 2>/dev/null || true
         done <<< "${ACCEPTED_FILES_MAP[$STATIONS_REPO]}"
         H_SAY "✓ Updated stations (partial, hired only)"
     else
         updated_any=0
         for station_src in "$TEMP_DIR/stations/stations"/*/; do
             station_name=$(basename "$station_src")
+            [ "$station_name" = "_empty_station" ] && continue # the template comes with makery-bakery
             [ -d "$REPO_ROOT/.makery/stations/$station_name" ] || continue
             rm -rf "$REPO_ROOT/.makery/stations/$station_name"
             cp -r "$station_src" "$REPO_ROOT/.makery/stations/$station_name"
@@ -433,22 +427,6 @@ if [ "$TOTAL_MERGED" -gt 0 ]; then
         fi
     fi
 
-    # Update local headchef
-    mkdir -p "$REPO_ROOT/.makery/headchef"
-    if [ "${PARTIAL_REPOS[$MULTI_REPO]}" = "1" ]; then
-        # Partial merge: copy only accepted files
-        while IFS= read -r f; do
-            [ -z "$f" ] && continue
-            rel="${f#makery/headchef/}"
-            mkdir -p "$REPO_ROOT/.makery/headchef/$(dirname "$rel")"
-            cp "$TEMP_DIR/multi/$f" "$REPO_ROOT/.makery/headchef/$rel" 2>/dev/null || true
-        done <<< "${ACCEPTED_FILES_MAP[$MULTI_REPO]}"
-        H_SAY "✓ Updated headchef (partial)"
-    else
-        if cp -r "$TEMP_DIR/multi/makery/headchef"/* "$REPO_ROOT/.makery/headchef/" 2>/dev/null; then
-            H_SAY "✓ Updated headchef"
-        fi
-    fi
 else
     H_SAY "No PRs were merged."
 fi

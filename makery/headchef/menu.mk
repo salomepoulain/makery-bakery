@@ -10,8 +10,10 @@ menu::
 		ITEM "clean/germs [name]" 		"Force all cooks (or just [name]) to use their dishsoap" && \
 		ITEM "station"		"Create a new station to modify according to your wishes" && \
 		ITEM "shady [path]"	"No path: stash this project'\''s contraband into .shadow/. With a path: stash just that too" && \
-		ITEM "request" 		"Send pull request with your station updates to the registry" && \
+		ITEM "request" 		"Send your station changes as a pull request to the registry (from your fork if it isn'\''t yours)" && \
+		ITEM "in" 			"Review and merge the pull requests on your registry" && \
 		ITEM "all" 			"Bake the whole kitchen (project) at once, except the stash, closing the makery" && \
+		ITEM "update" 		"Update bake, and this project'\''s kitchen (your stations stay as they are)" && \
 		H_LINE'
 
 inspo::

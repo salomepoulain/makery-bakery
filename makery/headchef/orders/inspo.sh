@@ -9,7 +9,9 @@ source "$(dirname "${BASH_SOURCE[0]}")/../personality.sh"
 H_STARTER "LOOKING FOR INSPIRATION AT THE AGENCY..."
 
 # Default to the stations repository if not set
-REPO_URL="${MAKERY_STATIONS_REPO:-https://github.com/salomepoulain/makery-stations}"
+# shellcheck source=../registry.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../registry.sh"
+REPO_URL="$REGISTRY_URL"
 
 H_SAY "Contacting the agency at $REPO_URL..."
 
@@ -17,7 +19,9 @@ H_SAY "Contacting the agency at $REPO_URL..."
 TMP_DIR=$(mktemp -d)
 # We only need the top level list of folders
 if ! git clone --depth 1 --filter=blob:none --sparse "$REPO_URL" "$TMP_DIR" > /dev/null 2>&1; then
-H_SAY "Could not reach the agency."
+    rm -rf "$TMP_DIR"
+    H_SAY "Could not reach the agency."
+    exit 1
 fi
 
 cd "$TMP_DIR" || exit 1
