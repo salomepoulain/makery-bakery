@@ -60,7 +60,14 @@ PROJECT_NAME=$(basename "$REPO_ROOT")
 SHADOW_DIR="${MAKERY_SHADOW_DIR:-$HOME/.shadow/projects}/$PROJECT_NAME"
 STATIONS_DIR=".makery/stations"
 
-mkdir -p "$SHADOW_DIR"
+mkdir -p "$SHADOW_DIR" 2>/dev/null
+
+# .shadow/ may live on a drive that isn't plugged in. Every stash link would
+# then look dead and get pruned, so stop before touching anything.
+if [ ! -d "$SHADOW_DIR" ]; then
+    H_SAY "Error: the stash isn't reachable ($SHADOW_DIR). Is the drive with .shadow/ plugged in? Nothing was changed."
+    exit 1
+fi
 
 # The stash layout replaced the old ledger file.
 rm -f "$SHADOW_DIR/.ledger"
