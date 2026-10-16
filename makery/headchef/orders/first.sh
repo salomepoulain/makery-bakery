@@ -146,7 +146,7 @@ fi
 # station directory with nothing built yet.
 if [ -L "__stash__" ]; then
 H_SAY "This project is already shady — stashing the new cook's contraband too..."
-    bash "$KITCHEN_ROOT/headchef/orders/shady.sh"
+    MAKERY_QUIET_SHADY=1 bash "$KITCHEN_ROOT/headchef/orders/shady.sh"
 fi
 
 H_FINISHED

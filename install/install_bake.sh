@@ -284,8 +284,13 @@ fi
 # Route to make. _empty_station is excluded from single-station auto-routing.
 if [ $# -ge 2 ] && [[ ! "$2" == *=* ]]; then
     _bake_first="$1"; _bake_second="$2"; shift 2
-    make --no-print-directory -f .makery/menu.mk "$_bake_first" s="$_bake_second" "$@" 2>/dev/null || \
+    # Decide up front whether this is a Head Chef order or a station call.
+    # Falling back on failure would rerun a real order that just errored.
+    if make --no-print-directory -f .makery/menu.mk -n "$_bake_first" >/dev/null 2>&1; then
+        make --no-print-directory -f .makery/menu.mk "$_bake_first" s="$_bake_second" "$@"
+    else
         make --no-print-directory -f .makery/menu.mk "call" s="$_bake_first" d="$_bake_second" "$@"
+    fi
 elif [ $# -eq 1 ] && [[ ! "$1" == *=* ]]; then
     if ! make --no-print-directory -f .makery/menu.mk -n "$1" >/dev/null 2>&1; then
         _stations=()
