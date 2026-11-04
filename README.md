@@ -367,7 +367,7 @@ bake safe python
 bake safe latex
 ```
 
-`bake safe` fetches the Station from your online registry and scans every script in it (shell, Python, make, anything with a shebang) for commands that reach the network or install software: `curl`, `wget`, `git clone/pull/push`, `gh`, `pip install`, `brew`, `apt`, `npm`, `docker`, `ssh`, `rsync`, `sudo`, URLs, and more. Comments don't count.
+`bake safe` fetches the Station from your online registry and scans every script in it (shell, Python, make, anything with a shebang) for commands that reach the network or install software: `curl`, `wget`, `git clone/pull/push`, `gh`, `pip install`, `brew`, `apt`, `npm`, `docker`, `ssh`, `rsync`, `sudo`, URLs, and more. Comments don't count, and neither do URLs to your own machine (`localhost`, `127.0.0.1`).
 
 - Nothing found: the Station is copied to `~/.makery-bakery/stations/<name>/`.
 - Something found: the Station is refused, and you see the file, line number and line for every hit. If you trust it anyway, run `bake safe <name> --force`.

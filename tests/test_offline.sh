@@ -27,6 +27,7 @@ cat > "$REG/stations/good/cook/contract/hired.sh" << 'EOF'
 #!/bin/bash
 # curl https://example.com would be bad, but this is only a comment
 touch hired-good.txt   # see https://example.com
+echo "Open http://localhost:3000/login or http://127.0.0.1:8888 in your browser"
 EOF
 printf 'menu::\n\t@true\n' > "$REG/stations/good/menu.mk"
 printf '#!/bin/bash\ntrue\n' > "$REG/stations/bad/cook/contract/hired.sh"
@@ -68,6 +69,13 @@ run "$BAKE" safe bad
 [ ! -d "$HOME/.makery-bakery/stations/bad" ] || fail "bad was copied despite the refusal"
 echo "$OUT" | grep -q "cook/skills/fetch.sh:2:" || fail "refusal does not name the file and line"
 pass "bake safe refuses a station that downloads, and shows file and line"
+
+mkdir -p "$REG/stations/sneaky/cook/contract"
+printf '#!/bin/bash\nX="https://localhost.example.com/p"\n' > "$REG/stations/sneaky/cook/contract/hired.sh"
+run "$BAKE" safe sneaky
+[ "$STATUS" -ne 0 ] || fail "a host that only starts with localhost should still be refused"
+rm -rf "$REG/stations/sneaky"
+pass "bake safe ignores URLs to this machine, but not hosts that only look like it"
 
 run "$BAKE" safe bad --force
 [ "$STATUS" -eq 0 ] || fail "bake safe bad --force should pass"
