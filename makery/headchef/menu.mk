@@ -13,6 +13,7 @@ menu::
 		ITEM "request" 		"Send your station changes as a pull request to the registry (from your fork if it isn'\''t yours)" && \
 		ITEM "in" 			"Review and merge the pull requests on your registry" && \
 		ITEM "update" 		"Update bake, and this project'\''s kitchen (your stations stay as they are)" && \
+		ITEM "safe [name]"	"Check a station for network use and copy it to the offline registry (~/.makery-bakery). No name: recheck all" && \
 		H_LINE'
 
 inspo::
@@ -70,3 +71,6 @@ station::
 
 shady::
 	@bash .makery/headchef/orders/shady.sh $(s)
+
+safe::
+	@bash .makery/headchef/orders/safe.sh "$(s)" "$(force)"

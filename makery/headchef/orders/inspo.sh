@@ -17,15 +17,23 @@ H_SAY "Contacting the agency at $REPO_URL..."
 
 # Use a temporary clone to see what's available
 TMP_DIR=$(mktemp -d)
-# We only need the top level list of folders
-if ! git clone --depth 1 --filter=blob:none --sparse "$REPO_URL" "$TMP_DIR" > /dev/null 2>&1; then
+if [ -d "$REPO_URL/stations" ]; then
+    # A folder on disk (like the offline registry): read it in place, no git, no network.
+    cd "$REPO_URL" || exit 1
+elif [ "${MAKERY_OFFLINE:-}" = 1 ]; then
     rm -rf "$TMP_DIR"
-    H_SAY "Could not reach the agency."
+    H_SAY "The offline registry ($REPO_URL/stations) is empty. Run 'bake safe <name>' on a machine with internet first."
     exit 1
+else
+    # We only need the top level list of folders
+    if ! git clone --depth 1 --filter=blob:none --sparse "$REPO_URL" "$TMP_DIR" > /dev/null 2>&1; then
+        rm -rf "$TMP_DIR"
+        H_SAY "Could not reach the agency."
+        exit 1
+    fi
+    cd "$TMP_DIR" || exit 1
+    git sparse-checkout set stations > /dev/null 2>&1
 fi
-
-cd "$TMP_DIR" || exit 1
-git sparse-checkout set stations > /dev/null 2>&1
 
 H_SAY "Available Line Cooks & Stations:"
 

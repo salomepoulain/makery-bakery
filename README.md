@@ -19,6 +19,7 @@
 - [Station structure](#station-structure)
 - [Creating new stations](#creating-new-stations)
 - [Using your own registry](#using-your-own-registry)
+- [makery-bakery on a cluster without internet](#makery-bakery-on-a-cluster-without-internet)
 - [Contributing](#contributing)
 - [Development setup](#development-setup)
 
@@ -101,6 +102,7 @@ make burnt s=python        # Fire the python station
 - `bake shady [path]`: no path stashes every hired Station's contraband; a path stashes just that one thing.
 - `bake request`: send your local Station changes as a PR to the registry. If you can't write to it, `bake request` forks it for you and opens the PR from your fork.
 - `bake in`: review the PRs on your registry file by file, merge what you accept, and update this project's hired Stations. Needs maintain/admin rights on the registry.
+- `bake safe [name]`: check a Station for network and install commands and copy it to the offline registry (`~/.makery-bakery`). No name rechecks every Station already there. See [makery-bakery on a cluster without internet](#makery-bakery-on-a-cluster-without-internet).
 
 Output scrolls in one line at a time on a terminal. Set `MAKERY_LINE_DELAY` to the pause per line in seconds, for example `export MAKERY_LINE_DELAY=0.01` in your `~/.zshrc` for slower or `0` for instant. Logs and pipes always get the output at full speed.
 
@@ -341,7 +343,77 @@ To use your own, make a repo with a `stations/` folder, or fork `makery-stations
 export MAKERY_REGISTRY=<you>/<your-stations>
 ```
 
-`bake request` then opens its pull requests on your repo, and `bake in` lets you review them file by file and merge them. Other people can send you Stations too: when they point `MAKERY_REGISTRY` at your repo and run `bake request`, it forks your repo for them and opens a PR on yours, which shows up in your `bake in`. Both need a GitHub `owner/repo` and `bake in` needs maintain/admin rights on it. `bake inspo` and `bake first` also accept a full git URL or a local path.
+`bake request` then opens its pull requests on your repo, and `bake in` lets you review them file by file and merge them. Other people can send you Stations too: when they point `MAKERY_REGISTRY` at your repo and run `bake request`, it forks your repo for them and opens a PR on yours, which shows up in your `bake in`. Both need a GitHub `owner/repo` and `bake in` needs maintain/admin rights on it. `bake inspo` and `bake first` also accept a full git URL or a local path. A local folder that has a `stations/` folder in it is copied as it is, without git.
+
+## makery-bakery on a cluster without internet
+
+Some machines may not reach the internet, or shouldn't: a secured cluster, a server behind a strict firewall. For those there's an **offline registry**, a plain folder at `~/.makery-bakery`, and an **offline bake** that hires only from that folder and never touches the network.
+
+You fill the offline registry on a machine that does have internet, then copy it over yourself.
+
+**1. On your own machine, with internet**, install `bake` as usual (see [Getting started](#getting-started)), then pick the Stations you want on the cluster:
+
+```bash
+bake safe python
+bake safe latex
+```
+
+`bake safe` fetches the Station from your online registry and scans every script in it (shell, Python, make, anything with a shebang) for commands that reach the network or install software: `curl`, `wget`, `git clone/pull/push`, `gh`, `pip install`, `brew`, `apt`, `npm`, `docker`, `ssh`, `rsync`, `sudo`, URLs, and more. Comments don't count.
+
+- Nothing found: the Station is copied to `~/.makery-bakery/stations/<name>/`.
+- Something found: the Station is refused, and you see the file, line number and line for every hit. If you trust it anyway, run `bake safe <name> --force`.
+
+`bake safe` without a name checks every Station in the offline registry again and copies the new version. If a Station that passed before now fails, the old copy stays.
+
+Every `bake safe` also writes an offline copy of your `bake` to `~/.makery-bakery/bake`. So the folder holds everything the cluster needs.
+
+**2. Copy the folder to the cluster.** Whatever way you copy it, the cluster needs exactly this, in your home folder:
+
+```
+~/.makery-bakery/
+├── bake            the offline bake
+└── stations/
+    ├── python/     one folder per Station you made safe
+    └── latex/
+```
+
+Copy the whole `.makery-bakery` folder as it is. Don't copy it into a project, and don't copy a project's `.makery/` folder: the offline bake makes that itself in every project you run it in.
+
+*By dragging, in VS Code with Remote-SSH.* No terminal command needed:
+
+1. Open a Remote-SSH window to the cluster and open your home folder there ("File > Open Folder…", then `~`).
+2. Find `.makery-bakery` on your own machine. It's hidden: in Finder press `Cmd+Shift+.` to show hidden folders, in Windows Explorer turn on "Hidden items" under View.
+3. Drag the `.makery-bakery` folder onto the empty space in VS Code's Explorer, so it lands directly in your home folder, not inside another folder.
+4. Dragging may drop the "executable" mark on `bake`. Open a terminal in the Remote-SSH window and run once:
+
+```bash
+chmod +x ~/.makery-bakery/bake
+```
+
+*With rsync*, if you're allowed to. `bake safe` prints this command at the end:
+
+```bash
+rsync -av ~/.makery-bakery/ <host>:~/.makery-bakery/
+```
+
+After every new `bake safe`, copy again. When dragging, let VS Code replace the existing files, run the `chmod` again, and delete a Station's folder on the cluster by hand if you no longer want it there.
+
+**3. On the cluster, once**, put the offline bake on your `PATH`, for example in `~/.bashrc`:
+
+```bash
+export PATH="$HOME/.makery-bakery:$PATH"
+```
+
+Then use `bake` in a project as usual. The offline bake:
+
+- hires (`bake first`) and lists (`bake inspo`) only from `~/.makery-bakery`. It ignores `MAKERY_REGISTRY`.
+- never checks for updates and refuses `bake update`. To update it, run `bake safe` on your own machine and copy the folder again.
+- refuses everything that needs GitHub: `bake in`, `bake request`, `bake release` and `bake safe`.
+- runs everything else as usual: `burnt`, `germs`, `shady`, `station` and every Station skill.
+
+The offline mode is written into the binary itself, not set with an environment variable, so it can't be switched off by accident.
+
+What it doesn't do: the scan reads scripts, it doesn't run them, so a command hidden in a variable can slip through. And a Station you add with `--force` can still try to download things on the cluster. Only force what you've read.
 
 ## Contributing
 
