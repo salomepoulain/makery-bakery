@@ -35,6 +35,7 @@ esac
 # Words that mean "reaches the network or installs something". Matched as
 # whole words, in every script of the station. Comments don't count: lines
 # that start with # or //, and anything after " #" at the end of a line.
+# Neither do URLs to this machine (localhost, 127.0.0.1, 0.0.0.0, [::1]).
 DANGER='(^|[^[:alnum:]_.-])(curl|wget|git[[:space:]]+(clone|pull|push|fetch|remote|submodule)|gh|pip3?[[:space:]]+install|uv[[:space:]]+(pip|add|sync|tool|run)|uvx|conda[[:space:]]+(install|create)|mamba|micromamba|brew|apt(-get)?|yum|dnf|npm|npx|pnpm|yarn|cargo[[:space:]]+install|go[[:space:]]+(install|get)|docker|podman|apptainer|singularity|sudo|ssh|scp|sftp|rsync|nc|telnet|ftp)([^[:alnum:]_-]|$)|--install-extension|https?://'
 
 H_STARTER "MAKING STATIONS SAFE FOR OFFLINE USE"
@@ -91,6 +92,7 @@ for name in "${NAMES[@]}"; do
         is_script "$file" || continue
         found=$(grep -nI '' "$file" 2>/dev/null \
             | sed -E 's#^([0-9]+:)[[:space:]]*(\#|//).*$#\1#; s#[[:space:]]\#.*$##; s#^([0-9]+:)#\1 #' \
+            | sed -E 's#https?://(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])([:/][^[:space:]"'"'"']*)?([^[:alnum:]._-]|$)#\3#g' \
             | grep -E "^[0-9]+:.*($DANGER)")
         [ -n "$found" ] || continue
         while IFS= read -r line; do
