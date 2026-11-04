@@ -12,7 +12,6 @@ menu::
 		ITEM "shady [path]"	"No path: stash this project'\''s contraband into .shadow/. With a path: stash just that too" && \
 		ITEM "request" 		"Send your station changes as a pull request to the registry (from your fork if it isn'\''t yours)" && \
 		ITEM "in" 			"Review and merge the pull requests on your registry" && \
-		ITEM "all" 			"Bake the whole kitchen (project) at once, except the stash, closing the makery" && \
 		ITEM "update" 		"Update bake, and this project'\''s kitchen (your stations stay as they are)" && \
 		ITEM "safe [name]"	"Check a station for network use and copy it to the offline registry (~/.makery-bakery). No name: recheck all" && \
 		H_LINE'
@@ -34,9 +33,6 @@ germs::
 
 clean::
 	@bash .makery/headchef/orders/clean.sh $(s)
-
-all::
-	@bash .makery/headchef/orders/all.sh
 
 call::
 	@bash -c 'S="$(s)"; D="$(d)"; \
