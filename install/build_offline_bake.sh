@@ -70,6 +70,7 @@ while IFS= read -r file; do
     { [ "$file" = "$WORK/head" ] || is_script "$file"; } || continue
     found=$(grep -nI '' "$file" 2>/dev/null \
         | sed -E 's#^([0-9]+:)[[:space:]]*(\#|//).*$#\1#; s#[[:space:]]\#.*$##; s#^([0-9]+:)#\1 #' \
+        | sed -E 's#https?://(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])([:/][^[:space:]"'"'"']*)?([^[:alnum:]._-]|$)#\3#g' \
         | grep -E "^[0-9]+:.*($DANGER)" || true)
     [ -n "$found" ] || continue
     while IFS= read -r line; do
