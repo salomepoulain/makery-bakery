@@ -58,10 +58,43 @@ run "$BAKE" safe good
 [ -f "$HOME/.makery-bakery/stations/good/cook/contract/hired.sh" ] || fail "good was not copied to the offline registry"
 pass "bake safe copies a clean station (comments with curl/URLs don't count)"
 
-[ -x "$OFFLINE_BAKE" ] || fail "bake safe did not write ~/.makery-bakery/bake"
+[ ! -e "$OFFLINE_BAKE" ] || fail "bake safe should no longer write an offline bake itself"
+pass "bake safe only fills the registry, it doesn't write a bake"
+
+# --- The offline bake, built by install/build_offline_bake.sh ---
+tar -czf "$TEMP_DIR/makery.tar.gz" -C "$PROJECT_ROOT/makery" .
+run bash "$PROJECT_ROOT/install/build_offline_bake.sh" "$TEMP_DIR/makery.tar.gz" test "$OFFLINE_BAKE"
+[ "$STATUS" -eq 0 ] || fail "build_offline_bake.sh failed"
 grep -q '^BAKE_OFFLINE=1$' "$OFFLINE_BAKE" || fail "offline bake does not have BAKE_OFFLINE=1"
-echo "$OUT" | grep -q "rsync -av ~/.makery-bakery/" || fail "bake safe did not print the rsync command"
-pass "bake safe writes an offline bake and prints the rsync command"
+OFFLINE_HEAD=$(awk '/^__PAYLOAD__$/{exit} 1' "$OFFLINE_BAKE")
+if echo "$OFFLINE_HEAD" | grep -qE 'curl|wget|https?://|_bake_update|_bake_check_upgrade|_bake_download_latest'; then
+    fail "the offline head still has update or download code"
+fi
+OFFLINE_KITCHEN="$TEMP_DIR/offline-kitchen"
+mkdir -p "$OFFLINE_KITCHEN"
+awk '/^__PAYLOAD__$/{flag=1; next} flag' "$OFFLINE_BAKE" | base64 -d | tar -xzf - -C "$OFFLINE_KITCHEN"
+for order in in request release safe; do
+    [ ! -e "$OFFLINE_KITCHEN/headchef/orders/$order.sh" ] || fail "the offline kitchen still has $order.sh"
+done
+if grep -qE 'ITEM "(request|in|update|safe)[" ]|^(request|in|release|safe)::' "$OFFLINE_KITCHEN/headchef/menu.mk"; then
+    fail "the offline menu still offers GitHub commands"
+fi
+if grep -rhE 'git (clone|pull|push|fetch)|curl|wget|github\.com' "$OFFLINE_KITCHEN/headchef" | grep -vE '^[[:space:]]*#'; then
+    fail "the offline kitchen still has network code"
+fi
+pass "the offline bake has no update code, no GitHub orders and no git clone"
+
+# A kitchen with network code left in it must not become an offline bake.
+LEAKY="$TEMP_DIR/leaky"
+mkdir -p "$LEAKY"
+cp -R "$PROJECT_ROOT/makery/." "$LEAKY/"
+printf '#!/bin/bash\ncurl -sL https://example.com\n' > "$LEAKY/headchef/orders/leak.sh"
+tar -czf "$TEMP_DIR/leaky.tar.gz" -C "$LEAKY" .
+run bash "$PROJECT_ROOT/install/build_offline_bake.sh" "$TEMP_DIR/leaky.tar.gz" test "$TEMP_DIR/leaky-bake"
+[ "$STATUS" -ne 0 ] || fail "build_offline_bake.sh built a bake with curl in it"
+echo "$OUT" | grep -q "leak.sh" || fail "the build refusal does not name the file"
+[ ! -e "$TEMP_DIR/leaky-bake" ] || fail "a refused build still wrote its output"
+pass "the build refuses a kitchen that still reaches the network"
 
 run "$BAKE" safe bad
 [ "$STATUS" -ne 0 ] || fail "bake safe bad should be refused"
@@ -89,6 +122,14 @@ run "$OFFLINE_BAKE" update
 echo "$OUT" | grep -q "offline bake" || fail "offline update refusal has no clear message"
 pass "offline bake refuses update"
 
+# Before any station is hired, so an unknown order can't fall through to one.
+for order in in request release safe; do
+    run "$OFFLINE_BAKE" "$order"
+    [ "$STATUS" -ne 0 ] || fail "offline bake $order should not run"
+    echo "$OUT" | grep -q "Not a valid argument" || fail "offline bake $order is not unknown"
+done
+pass "offline bake doesn't know in, request, release or safe"
+
 run "$OFFLINE_BAKE" first good
 [ "$STATUS" -eq 0 ] || fail "offline bake first good should hire from the offline registry"
 [ -f hired-good.txt ] || fail "good's hired.sh did not run"
@@ -97,13 +138,6 @@ pass "offline bake hires from ~/.makery-bakery and ignores MAKERY_REGISTRY"
 run "$OFFLINE_BAKE" inspo
 echo "$OUT" | grep -q "good" || fail "offline inspo does not list the offline registry"
 pass "offline bake inspo lists the offline registry"
-
-for order in in request release safe; do
-    run "$OFFLINE_BAKE" "$order"
-    [ "$STATUS" -ne 0 ] || fail "offline bake $order should refuse"
-    echo "$OUT" | grep -q "offline bake" || fail "offline bake $order has no clear message"
-done
-pass "offline bake refuses in, request, release and safe"
 
 # --- The offline package that `bake release` builds ---
 # Run release.sh's OFFLINE PACKAGE block on its own, against the fake registry,
@@ -140,6 +174,9 @@ mkdir -p "$HOME" && cd "$HOME"
 unzip -q "$ZIP" && mv makery-bakery .makery-bakery && chmod +x .makery-bakery/bake
 grep -q '^BAKE_OFFLINE=1$' .makery-bakery/bake || fail "the packaged bake is not offline"
 grep -q '^BAKE_VERSION="vtest"$' .makery-bakery/bake || fail "the packaged bake has no version"
+if awk '/^__PAYLOAD__$/{exit} 1' .makery-bakery/bake | grep -qE 'curl|_bake_update'; then
+    fail "the packaged bake still has update code"
+fi
 mkdir -p "$TEMP_DIR/cluster2" && cd "$TEMP_DIR/cluster2"
 run "$HOME/.makery-bakery/bake" first good
 { [ "$STATUS" -eq 0 ] && [ -f hired-good.txt ]; } || fail "the packaged offline bake could not hire good"

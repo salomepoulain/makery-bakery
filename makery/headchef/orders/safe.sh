@@ -8,9 +8,9 @@
 # pass --force. Without a name, every station already in the offline
 # registry is checked and copied again.
 #
-# The bake binary writes an offline copy of itself next to the registry
-# afterwards, so `rsync ~/.makery-bakery` carries everything to a machine
-# without internet.
+# The offline bake itself isn't made here: take it from the latest
+# makery-bakery-offline.zip. It's built by install/build_offline_bake.sh,
+# which leaves out all network code, this order included.
 
 # shellcheck source=../personality.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../personality.sh"
@@ -126,5 +126,6 @@ for name in "${NAMES[@]}"; do
 done
 
 H_SAY "Offline registry: $OFFLINE_REGISTRY/stations"
+H_SAY "Put the offline bake from the latest makery-bakery-offline.zip next to it, then copy ~/.makery-bakery to the cluster."
 H_LINE
 exit $REFUSED

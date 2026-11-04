@@ -22,8 +22,9 @@ if [ -d "$REPO_URL/stations" ]; then
     cd "$REPO_URL" || exit 1
 elif [ "${MAKERY_OFFLINE:-}" = 1 ]; then
     rm -rf "$TMP_DIR"
-    H_SAY "The offline registry ($REPO_URL/stations) is empty. Run 'bake safe <name>' on a machine with internet first."
+    H_SAY "The offline registry ($REPO_URL/stations) is empty. Copy a makery-bakery-offline package there first."
     exit 1
+# >>> online-only
 else
     # We only need the top level list of folders
     if ! git clone --depth 1 --filter=blob:none --sparse "$REPO_URL" "$TMP_DIR" > /dev/null 2>&1; then
@@ -33,6 +34,7 @@ else
     fi
     cd "$TMP_DIR" || exit 1
     git sparse-checkout set stations > /dev/null 2>&1
+# <<< online-only
 fi
 
 H_SAY "Available Line Cooks & Stations:"

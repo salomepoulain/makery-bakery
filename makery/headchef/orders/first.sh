@@ -38,12 +38,14 @@ if [ -d "$STATIONS_REPO/stations" ]; then
         cp -R "$STATIONS_REPO/stations/$STATION_NAME" "$TMP_DIR/stations/" && IN_REGISTRY=1
     fi
 elif [ "${MAKERY_OFFLINE:-}" = 1 ]; then
-    H_SAY "The offline registry ($STATIONS_REPO/stations) is empty. Run 'bake safe <name>' on a machine with internet first."
+    H_SAY "The offline registry ($STATIONS_REPO/stations) is empty. Copy a makery-bakery-offline package there first."
+# >>> online-only
 elif git clone --depth 1 --filter=blob:none --sparse "$STATIONS_REPO" "$TMP_DIR" > /dev/null 2>&1; then
     git -C "$TMP_DIR" sparse-checkout set "stations/$STATION_NAME" > /dev/null 2>&1
     [ -d "$TMP_DIR/stations/$STATION_NAME" ] && IN_REGISTRY=1
 else
     H_SAY "Couldn't reach the Registry ($MAKERY_REGISTRY)."
+# <<< online-only
 fi
 
 # FROM_REGISTRY=1: the station folder below is a fresh registry copy, safe to

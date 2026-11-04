@@ -19,10 +19,12 @@ OFFLINE_REGISTRY="$HOME/.makery-bakery"
 if [ "${MAKERY_OFFLINE:-}" = 1 ]; then
     MAKERY_REGISTRY="$OFFLINE_REGISTRY"
     REGISTRY_URL="$OFFLINE_REGISTRY"
+# >>> online-only
 else
     MAKERY_REGISTRY="${MAKERY_REGISTRY:-salomepoulain/makery-stations}"
     case "$MAKERY_REGISTRY" in
         */*/* | *:*) REGISTRY_URL="$MAKERY_REGISTRY" ;;
         *) REGISTRY_URL="https://github.com/$MAKERY_REGISTRY" ;;
     esac
+# <<< online-only
 fi

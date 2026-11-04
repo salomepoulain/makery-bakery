@@ -360,7 +360,7 @@ https://github.com/salomepoulain/makery-bakery/releases/latest/download/makery-b
 
 Unzip it. You get a folder `makery-bakery/` with `bake` and `stations/` in it. Delete the Station folders you don't want, then go to step 2. The folder is called `makery-bakery` without the dot so it doesn't hide itself after unzipping. You rename it on the cluster.
 
-**1b. Or build it yourself**, on a machine with internet and `bake` installed (see [Getting started](#getting-started)). This also works with your own registry, and lets you force a Station in. Pick the Stations you want on the cluster:
+**1b. Or pick the Stations yourself**, on a machine with internet and `bake` installed (see [Getting started](#getting-started)). This also works with your own registry, and lets you force a Station in. Pick the Stations you want on the cluster:
 
 ```bash
 bake safe python
@@ -374,7 +374,7 @@ bake safe latex
 
 `bake safe` without a name checks every Station in the offline registry again and copies the new version. If a Station that passed before now fails, the old copy stays.
 
-Every `bake safe` also writes an offline copy of your `bake` to `~/.makery-bakery/bake`. So the folder holds everything the cluster needs.
+`bake safe` only fills `stations/`. The offline `bake` itself always comes from a release: take `bake` out of the latest `makery-bakery-offline.zip` and put it in `~/.makery-bakery/`.
 
 **2. Copy the folder to the cluster.** Whatever way you copy it, the cluster needs exactly this, in your home folder:
 
@@ -406,7 +406,7 @@ rm -rf ~/.makery-bakery && mv ~/makery-bakery ~/.makery-bakery
 chmod +x ~/.makery-bakery/bake
 ```
 
-*With rsync*, if you're allowed to. `bake safe` prints this command at the end:
+*With rsync*, if you're allowed to:
 
 ```bash
 rsync -av ~/.makery-bakery/ <host>:~/.makery-bakery/
@@ -423,11 +423,11 @@ export PATH="$HOME/.makery-bakery:$PATH"
 Then use `bake` in a project as usual. The offline bake:
 
 - hires (`bake first`) and lists (`bake inspo`) only from `~/.makery-bakery`. It ignores `MAKERY_REGISTRY`.
-- never checks for updates and refuses `bake update`. To update it, get a newer package (1a or 1b) and copy it again.
-- refuses everything that needs GitHub: `bake in`, `bake request`, `bake release` and `bake safe`.
+- has no update code and says so on `bake update`. To update it, get a newer zip and copy it again.
+- doesn't have the commands that need GitHub: `bake in`, `bake request`, `bake release` and `bake safe` aren't in it.
 - runs everything else as usual: `burnt`, `germs`, `shady`, `station` and every Station skill.
 
-The offline mode is written into the binary itself, not set with an environment variable, so it can't be switched off by accident.
+The offline bake isn't the normal `bake` with network code switched off: that code isn't in it at all. `install/build_offline_bake.sh` builds it for every release. It deletes the orders that need GitHub, cuts every block marked `# >>> online-only` … `# <<< online-only` out of the `bake` head and the kitchen (update checks, downloads, `git clone`), and then scans the result with the same rules as `bake safe`. If anything that reaches the network is left, the build fails and the release goes out without an offline package.
 
 What it doesn't do: the scan reads scripts, it doesn't run them, so a command hidden in a variable can slip through. And a Station you add with `--force` can still try to download things on the cluster. Only force what you've read.
 
@@ -437,6 +437,8 @@ To add a Station:
 1. Follow the Station template.
 2. Run `bake request` to open a PR with your local Station updates on your registry (`MAKERY_REGISTRY`).
 3. `bake request` only syncs Stations. Change the Head Chef with a pull request to this repo.
+
+Changing the Head Chef or the `bake` head? Wrap anything that reaches the network in `# >>> online-only` and `# <<< online-only` lines, so the offline bake leaves it out. `tests/test_offline.sh` fails if you forget.
 
 `bake release` publishes a new version of makery-bakery itself. It's only for this repo's maintainers, so it doesn't show up in `bake menu` or [Core commands](#core-commands).
 
