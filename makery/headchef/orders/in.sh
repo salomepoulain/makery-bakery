@@ -21,6 +21,12 @@ fi
 # shellcheck source=../personality.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../personality.sh"
 
+# An offline bake never talks to GitHub.
+if [ "${MAKERY_OFFLINE:-}" = 1 ]; then
+    H_SAY "This is an offline bake. 'bake in' needs GitHub, so it's switched off here."
+    exit 1
+fi
+
 find_project_root() {
     local current="$PWD"
     while [[ "$current" != "/" ]]; do
