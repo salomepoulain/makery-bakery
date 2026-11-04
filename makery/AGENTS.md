@@ -46,8 +46,8 @@ Station commands are scripts that run with the human's own permissions. A rule l
 `git push`" doesn't stop a bake command that pushes inside its script. So: if you aren't allowed
 to do something directly, don't do it through a bake command either.
 
-- `bake all` and `bake burnt` delete files. They refuse without a real terminal. Never get around
-  that, so no `echo y |`, no `script`, no faked terminal.
+- `bake burnt` deletes files. It refuses without a real terminal. Never get around that, so no
+  `echo y |`, no `script`, no faked terminal.
 - `bake request`, `bake in` and `bake release` send, merge or publish things other people see.
 - `bake first`, `bake update` and `bake shady` install software or move files. `bake first` runs
   the station's `hired.sh`, which can do anything. Only run these when the human asks for it in

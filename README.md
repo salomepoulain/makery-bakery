@@ -101,7 +101,6 @@ make burnt s=python        # Fire the python station
 - `bake shady [path]`: no path stashes every hired Station's contraband; a path stashes just that one thing.
 - `bake request`: send your local Station changes as a PR to the registry. If you can't write to it, `bake request` forks it for you and opens the PR from your fork.
 - `bake in`: review the PRs on your registry file by file, merge what you accept, and update this project's hired Stations. Needs maintain/admin rights on the registry.
-- `bake all`: fire every Station and delete the entire project directory, not just `.makery`. Only what already went shady survives. See the warning under [The kitchen, as a set of nested regions](#the-kitchen-as-a-set-of-nested-regions).
 
 Output scrolls in one line at a time on a terminal. Set `MAKERY_LINE_DELAY` to the pause per line in seconds, for example `export MAKERY_LINE_DELAY=0.01` in your `~/.zshrc` for slower or `0` for instant. Logs and pipes always get the output at full speed.
 
@@ -141,14 +140,14 @@ Use makery-bakery at your own risk. It's MIT licensed, comes without any warrant
 
 What makery-bakery does about it:
 
-- `bake all` and `bake burnt` only run from a real terminal, and `bake all` makes you type the project name. An agent's command, or `echo y | bake all`, gets refused.
+- `bake burnt` only runs from a real terminal. An agent's command, or `echo y | bake burnt <name>`, gets refused.
 - Every kitchen ships `.makery/AGENTS.md`, which tells agents which commands they must never run.
 
 That's where it stops. makery can't be a stronger lock than your agent's own permissions: an agent that can run `bake` can also run `rm -rf`, or fake a terminal. So deny the commands you don't want an agent to run in the agent's own settings. In Claude Code, for example:
 
 ```json
 "permissions": {
-  "deny": ["Bash(bake all:*)", "Bash(bake burnt:*)", "Bash(bake request:*)", "Bash(bake in:*)", "Bash(bake claude commit-yolo:*)"]
+  "deny": ["Bash(bake burnt:*)", "Bash(bake request:*)", "Bash(bake in:*)", "Bash(bake claude commit-yolo:*)"]
 }
 ```
 
@@ -220,13 +219,7 @@ The deeper the orange, the further from git. The pale outer box is the project r
 | `bake shady [path]` | one Station's `.contraband`, or every hired Station's | Moves the listed paths (or just `path`) into `~/.shadow/projects/<project>/`, leaves a `__stash__` symlink, and links back whatever the stash holds. |
 | `bake burnt <name>` / `bake last <name>` | the whole Station's `.countertop` | Runs `fired.sh`, then clears every path in `.countertop`, which already covers `.dishsoap` (that's why it's listed there too), then deletes the Station directory. |
 | `bake first <name>` | `.countertop` (+ auto-restash) | Appends the Station's countertop entries to `.gitignore`; if the project already went shady, re-runs `bake shady` so the new Station's contraband is covered too. |
-| `bake all` | the entire project directory, everything under `ROOT`, except `__stash__`'s target | Fires every Station, then deletes the project root itself, not just `.makery`. See the warning below. |
 | `git` / GitHub | everything outside `.gitignore` | The complement of `KITCHEN` in the diagram above, not a subset of it. |
-
-> [!WARNING]
-> `bake all` does not just tear down `.makery`. After firing every Station it runs `rm -rf` on the **project root itself**, git history and all. The only reason anything survives is that `.contraband` was physically moved out to `~/.shadow/` by `bake shady`, `rm -rf` on the `__stash__` symlink only removes the link. `bake all` asks for a `y/N` confirmation first, but say yes and there's no undo.
->
-> It also doesn't clean up after itself in `~/.shadow/`. Once the project is gone, `~/.shadow/projects/<project>/` is an orphan nothing points at anymore, `bake all` never deletes it. If you're done with a project for good, `rm -rf ~/.shadow/projects/<project>/` is on you.
 
 ## Going shady
 
