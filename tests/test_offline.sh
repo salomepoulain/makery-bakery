@@ -150,6 +150,24 @@ run "$OFFLINE_BAKE" first good
 [ -f hired-good.txt ] || fail "good's hired.sh did not run"
 pass "offline bake hires from ~/.makery-bakery and ignores MAKERY_REGISTRY"
 
+# Unpacking the kitchen keeps it out of git, once, without breaking a last line.
+mkdir -p "$TEMP_DIR/gitproj" && cd "$TEMP_DIR/gitproj"
+git init -q
+printf 'data/' > .gitignore
+run "$OFFLINE_BAKE" inspo
+[ "$(grep -cx '\.makery/' .gitignore)" = 1 ] || fail ".makery/ is not in .gitignore once"
+[ "$(grep -cx '__trash__/' .gitignore)" = 1 ] || fail "__trash__/ is not in .gitignore once"
+grep -qx 'data/' .gitignore || fail "the last line of .gitignore got glued to a new one"
+if git status --porcelain --ignored=no | grep -qE '\.makery|__trash__'; then fail "git still sees the kitchen"; fi
+rm -rf .makery
+run "$OFFLINE_BAKE" inspo
+[ "$(grep -cx '\.makery/' .gitignore)" = 1 ] || fail "unpacking again added .makery/ twice"
+mkdir -p "$TEMP_DIR/nogit" && cd "$TEMP_DIR/nogit"
+run "$OFFLINE_BAKE" inspo
+[ ! -e .gitignore ] || fail "bake made a .gitignore outside a git project"
+pass "unpacking adds .makery/ and __trash__/ to .gitignore in a git project, once"
+cd "$TEMP_DIR/cluster"
+
 run "$OFFLINE_BAKE" inspo
 echo "$OUT" | grep -q "good" || fail "offline inspo does not list the offline registry"
 pass "offline bake inspo lists the offline registry"

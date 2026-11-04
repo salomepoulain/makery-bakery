@@ -60,7 +60,7 @@ There are two installation paths: one for `bake` users, one for `make` users.
    ```bash
    bake
    ```
-   On first use it extracts the embedded payload into `./.makery/`. Later runs skip extraction and route straight to `make`. Your project's `Makefile` stays untouched.
+   On first use it extracts the embedded payload into `./.makery/`. In a git project it also adds `.makery/` and `__trash__/` to `.gitignore`, if they aren't there yet. Later runs skip extraction and route straight to `make`. Your project's `Makefile` stays untouched.
 
 **Upgrading:** re-run the same `curl | bash` command. It overwrites `~/.local/bin/bake` with the latest payload. Existing projects keep their own `.makery/`; new projects get the new one.
 
