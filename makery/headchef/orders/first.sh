@@ -31,7 +31,15 @@ H_STARTER "HIRING COOK & OPENING STATION: $STATION_NAME"
 H_SAY "Looking for '$STATION_NAME' in the Registry..."
 TMP_DIR=$(mktemp -d)
 IN_REGISTRY=0
-if git clone --depth 1 --filter=blob:none --sparse "$STATIONS_REPO" "$TMP_DIR" > /dev/null 2>&1; then
+if [ -d "$STATIONS_REPO/stations" ]; then
+    # A folder on disk (like the offline registry): copy, no git, no network.
+    if [ -d "$STATIONS_REPO/stations/$STATION_NAME" ]; then
+        mkdir -p "$TMP_DIR/stations"
+        cp -R "$STATIONS_REPO/stations/$STATION_NAME" "$TMP_DIR/stations/" && IN_REGISTRY=1
+    fi
+elif [ "${MAKERY_OFFLINE:-}" = 1 ]; then
+    H_SAY "The offline registry ($STATIONS_REPO/stations) is empty. Run 'bake safe <name>' on a machine with internet first."
+elif git clone --depth 1 --filter=blob:none --sparse "$STATIONS_REPO" "$TMP_DIR" > /dev/null 2>&1; then
     git -C "$TMP_DIR" sparse-checkout set "stations/$STATION_NAME" > /dev/null 2>&1
     [ -d "$TMP_DIR/stations/$STATION_NAME" ] && IN_REGISTRY=1
 else

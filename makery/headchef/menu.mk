@@ -14,6 +14,7 @@ menu::
 		ITEM "in" 			"Review and merge the pull requests on your registry" && \
 		ITEM "all" 			"Bake the whole kitchen (project) at once, except the stash, closing the makery" && \
 		ITEM "update" 		"Update bake, and this project'\''s kitchen (your stations stay as they are)" && \
+		ITEM "safe [name]"	"Check a station for network use and copy it to the offline registry (~/.makery-bakery). No name: recheck all" && \
 		H_LINE'
 
 inspo::
@@ -74,3 +75,6 @@ station::
 
 shady::
 	@bash .makery/headchef/orders/shady.sh $(s)
+
+safe::
+	@bash .makery/headchef/orders/safe.sh "$(s)" "$(force)"

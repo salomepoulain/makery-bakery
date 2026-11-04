@@ -110,6 +110,15 @@ TMP_BAKE_PATH=$(mktemp)
 
 BAKE_VERSION="__BAKE_VERSION__"
 
+# An offline bake never touches the network: no update checks, no `bake
+# update`, and it hires only from the offline registry (~/.makery-bakery).
+# `bake safe` writes an offline copy of this file by flipping the line below,
+# so it's baked in and can't be switched off with an environment variable.
+BAKE_OFFLINE=0
+if [ "$BAKE_OFFLINE" = 1 ]; then
+    export MAKERY_OFFLINE=1 BAKE_NO_UPDATE_CHECK=1
+fi
+
 _bake_logo() {
     cat <<'__EOF__'
            ▄▄  ▗▖ ▗▄▖ ▗▖ ▗▖▗▄▄▄▖▗▄▄▖▗▖  ▗▖
@@ -281,11 +290,38 @@ _bake_update() {
     curl -fsSL "$_BAKE_INSTALLER_URL" | bash
 }
 
+_bake_write_offline() {
+    # Write an offline copy of this binary next to the offline registry, so
+    # one rsync of ~/.makery-bakery carries both to a machine without internet.
+    local dir="$HOME/.makery-bakery"
+    mkdir -p "$dir"
+    sed 's/^BAKE_OFFLINE=0$/BAKE_OFFLINE=1/' "$0" > "$dir/.bake.tmp" || return 1
+    chmod +x "$dir/.bake.tmp" && mv "$dir/.bake.tmp" "$dir/bake"
+    echo "Offline bake written to $dir/bake ($BAKE_VERSION)."
+    echo "Put it on your cluster with:"
+    echo "  rsync -av ~/.makery-bakery/ <host>:~/.makery-bakery/"
+}
+
 # Handle `bake update`: always fetch + install the latest release.
 if [ $# -eq 1 ] && [ "$1" = "update" ]; then
+    if [ "$BAKE_OFFLINE" = 1 ]; then
+        echo "This is an offline bake, it can't update itself. Run 'bake safe' on a machine with internet and rsync ~/.makery-bakery again." >&2
+        exit 1
+    fi
     _bake_update
     exit $?
 fi
+
+# `bake safe ... --force`: make can't take --force, so hand it over as force=1.
+if [ "${1:-}" = "safe" ]; then
+    _bake_args=()
+    for _bake_arg in "$@"; do
+        [ "$_bake_arg" = "--force" ] && _bake_arg="force=1"
+        _bake_args+=("$_bake_arg")
+    done
+    set -- "${_bake_args[@]}"
+fi
+_bake_order="${1:-}"
 
 # Ensure .makery/ exists in the current directory (just-in-time bootstrap).
 [ -d ".makery" ] || _bake_extract
@@ -349,7 +385,13 @@ elif [ $# -eq 1 ] && [[ ! "$1" == *=* ]]; then
 else
     make --no-print-directory -f .makery/menu.mk "$@"
 fi
-exit $?
+_bake_status=$?
+
+# After `bake safe`, refresh the offline bake that travels with the registry.
+if [ "$_bake_order" = "safe" ] && [ "$BAKE_OFFLINE" != 1 ]; then
+    _bake_write_offline
+fi
+exit $_bake_status
 __BAKE_HEAD_EOF__
   echo "__PAYLOAD__"
   base64 < "$TMP_TARBALL"
