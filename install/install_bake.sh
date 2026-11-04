@@ -306,7 +306,10 @@ _bake_write_offline() {
 # Handle `bake update`: always fetch + install the latest release.
 if [ $# -eq 1 ] && [ "$1" = "update" ]; then
     if [ "$BAKE_OFFLINE" = 1 ]; then
-        echo "This is an offline bake, it can't update itself. Run 'bake safe' on a machine with internet and rsync ~/.makery-bakery again." >&2
+        echo "This is an offline bake ($BAKE_VERSION), it can't update itself." >&2
+        echo "Download a newer makery-bakery-offline.zip in a browser:" >&2
+        echo "  https://github.com/salomepoulain/makery-bakery/releases/latest/download/makery-bakery-offline.zip" >&2
+        echo "or run 'bake safe' on a machine with internet, then copy the folder to ~/.makery-bakery again." >&2
         exit 1
     fi
     _bake_update
