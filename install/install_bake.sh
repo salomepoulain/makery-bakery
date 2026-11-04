@@ -110,13 +110,13 @@ TMP_BAKE_PATH=$(mktemp)
 
 BAKE_VERSION="__BAKE_VERSION__"
 
-# An offline bake never touches the network: no update checks, no `bake
-# update`, and it hires only from the offline registry (~/.makery-bakery).
-# `bake safe` writes an offline copy of this file by flipping the line below,
-# so it's baked in and can't be switched off with an environment variable.
+# An offline bake never touches the network. install/build_offline_bake.sh
+# builds it from this file: it flips the line below and cuts out every block
+# between ">>> online-only" and "<<< online-only", so an offline bake holds no
+# network code at all, not even switched off.
 BAKE_OFFLINE=0
 if [ "$BAKE_OFFLINE" = 1 ]; then
-    export MAKERY_OFFLINE=1 BAKE_NO_UPDATE_CHECK=1
+    export MAKERY_OFFLINE=1
 fi
 
 _bake_logo() {
@@ -133,6 +133,7 @@ _bake_logo() {
                                   ▀▀▀
 __EOF__
 }
+# >>> online-only
 _BAKE_REPO_API="https://api.github.com/repos/salomepoulain/makery-bakery/releases/latest"
 _BAKE_REPO_DL="https://github.com/salomepoulain/makery-bakery/releases/download"
 _BAKE_INSTALLER_URL="https://github.com/salomepoulain/makery-bakery/releases/latest/download/install_bake.sh"
@@ -199,12 +200,16 @@ _bake_refresh_kitchen() {
     return 0
 }
 
+# <<< online-only
+
 _bake_extract() {
-    local src="" tmp="" _upgraded=0
+    mkdir -p .makery
+    mkdir -p __trash__
+    # >>> online-only
+    local src="" tmp=""
     if _bake_check_upgrade; then
         if tmp=$(_bake_download_latest); then
             src="$tmp"
-            _upgraded=1
             read -r -p "Also upgrade your global bake binary? [y/N] " _ans2
             if [[ "$_ans2" =~ ^[Yy] ]]; then
                 echo "Upgrading global bake..."
@@ -214,20 +219,22 @@ _bake_extract() {
             echo "Download of $_LATEST_TAG failed — using the version embedded in this binary ($BAKE_VERSION)." >&2
         fi
     fi
-    mkdir -p .makery
-    mkdir -p __trash__
     if [ -n "$src" ]; then
         tar -xzf "$src" -C .makery
         rm -f "$src"
         echo "Installed .makery/ from $_LATEST_TAG."
-    else
-        awk '/^__PAYLOAD__$/{flag=1;next}flag' "$0" | base64 -d | tar -xzf - -C .makery
-        [ "$_upgraded" -eq 0 ] && echo "Installed .makery/ from embedded payload ($BAKE_VERSION)."
+        chmod +x .makery/headchef/orders/*.sh 2>/dev/null
+        rm -f bake 2>/dev/null
+        return 0
     fi
+    # <<< online-only
+    awk '/^__PAYLOAD__$/{flag=1;next}flag' "$0" | base64 -d | tar -xzf - -C .makery
+    echo "Installed .makery/ from embedded payload ($BAKE_VERSION)."
     chmod +x .makery/headchef/orders/*.sh 2>/dev/null
     rm -f bake 2>/dev/null
 }
 
+# >>> online-only
 _bake_upgrade_check() {
     # Bare-bake release check. Two independent y/N prompts: project + global.
     [ -t 0 ] && [ -t 1 ] || return 0
@@ -290,28 +297,8 @@ _bake_update() {
     curl -fsSL "$_BAKE_INSTALLER_URL" | bash
 }
 
-_bake_write_offline() {
-    # Write an offline copy of this binary next to the offline registry, so
-    # one rsync of ~/.makery-bakery carries both to a machine without internet.
-    local dir="$HOME/.makery-bakery"
-    mkdir -p "$dir"
-    sed 's/^BAKE_OFFLINE=0$/BAKE_OFFLINE=1/' "$0" > "$dir/.bake.tmp" || return 1
-    chmod +x "$dir/.bake.tmp" && mv "$dir/.bake.tmp" "$dir/bake"
-    echo "Offline bake written to $dir/bake ($BAKE_VERSION)."
-    echo "Put the whole ~/.makery-bakery folder in your home folder on the cluster:"
-    echo "  drag it into a VS Code Remote-SSH window, then run: chmod +x ~/.makery-bakery/bake"
-    echo "  or: rsync -av ~/.makery-bakery/ <host>:~/.makery-bakery/"
-}
-
 # Handle `bake update`: always fetch + install the latest release.
 if [ $# -eq 1 ] && [ "$1" = "update" ]; then
-    if [ "$BAKE_OFFLINE" = 1 ]; then
-        echo "This is an offline bake ($BAKE_VERSION), it can't update itself." >&2
-        echo "Download a newer makery-bakery-offline.zip in a browser:" >&2
-        echo "  https://github.com/salomepoulain/makery-bakery/releases/latest/download/makery-bakery-offline.zip" >&2
-        echo "or run 'bake safe' on a machine with internet, then copy the folder to ~/.makery-bakery again." >&2
-        exit 1
-    fi
     _bake_update
     exit $?
 fi
@@ -325,7 +312,13 @@ if [ "${1:-}" = "safe" ]; then
     done
     set -- "${_bake_args[@]}"
 fi
-_bake_order="${1:-}"
+# <<< online-only
+
+if [ "$BAKE_OFFLINE" = 1 ] && [ $# -eq 1 ] && [ "$1" = "update" ]; then
+    echo "This is an offline bake ($BAKE_VERSION), it can't update itself." >&2
+    echo "Get a newer makery-bakery-offline.zip and copy it to ~/.makery-bakery again." >&2
+    exit 1
+fi
 
 # Ensure .makery/ exists in the current directory (just-in-time bootstrap).
 [ -d ".makery" ] || _bake_extract
@@ -338,7 +331,9 @@ fi
 
 # Bare `bake` (no args): release check, then logo.
 if [ $# -eq 0 ]; then
+    # >>> online-only
     _bake_upgrade_check
+    # <<< online-only
     _bake_logo
 fi
 
@@ -389,13 +384,7 @@ elif [ $# -eq 1 ] && [[ ! "$1" == *=* ]]; then
 else
     make --no-print-directory -f .makery/menu.mk "$@"
 fi
-_bake_status=$?
-
-# After `bake safe`, refresh the offline bake that travels with the registry.
-if [ "$_bake_order" = "safe" ] && [ "$BAKE_OFFLINE" != 1 ]; then
-    _bake_write_offline
-fi
-exit $_bake_status
+exit $?
 __BAKE_HEAD_EOF__
   echo "__PAYLOAD__"
   base64 < "$TMP_TARBALL"

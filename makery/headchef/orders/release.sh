@@ -123,21 +123,21 @@ H_SAY "✓ Checksum: $(cat "$CHECKSUM_PATH")"
 # Unzip it, drag it into your home on the cluster, rename it to .makery-bakery.
 OFFLINE_ZIP="$ARCHIVE_DIR/makery-bakery-offline-$VERSION.zip"
 OFFLINE_ASSET=()
-if command -v zip > /dev/null 2>&1; then
+if ! command -v zip > /dev/null 2>&1; then
+    H_SAY "! zip not found, so this release has no offline package."
+elif ! bash "$TEMP_DIR/multi/install/build_offline_bake.sh" "$TARBALL_PATH" "$VERSION" \
+        "$TEMP_DIR/offline-bake" 2> "$TEMP_DIR/offline-bake.log"; then
+    # The builder refuses to make an offline bake that could still reach the network.
+    H_SAY "! The offline bake failed its own network check, so this release has no offline package:"
+    cat "$TEMP_DIR/offline-bake.log"
+else
     H_SAY "Building the offline package..."
     PKG_HOME="$TEMP_DIR/offline-home"
     PKG="$PKG_HOME/.makery-bakery"
     mkdir -p "$PKG/stations"
 
-    # The offline bake: the same binary install_bake.sh writes, flipped to offline.
-    {
-        awk "/^  cat << '__BAKE_HEAD_EOF__'\$/{flag=1;next} /^__BAKE_HEAD_EOF__\$/{flag=0} flag" \
-            "$TEMP_DIR/multi/install/install_bake.sh" \
-            | sed -e "s/__BAKE_VERSION__/$VERSION/" -e 's/^BAKE_OFFLINE=0$/BAKE_OFFLINE=1/'
-        echo "__PAYLOAD__"
-        base64 < "$TARBALL_PATH"
-    } > "$PKG/bake"
-    chmod +x "$PKG/bake"
+    # The offline bake: no update code, no GitHub orders, checked by its builder.
+    mv "$TEMP_DIR/offline-bake" "$PKG/bake"
 
     # Every registry Station that passes this release's own `bake safe` scan.
     # shellcheck source=../registry.sh
@@ -170,8 +170,6 @@ if command -v zip > /dev/null 2>&1; then
     cp "$TEMP_DIR/makery-bakery-offline.zip" "$OFFLINE_ZIP"
     OFFLINE_ASSET=("$TEMP_DIR/makery-bakery-offline.zip")
     H_SAY "✓ Saved: $OFFLINE_ZIP ($(du -h "$OFFLINE_ZIP" | cut -f1))"
-else
-    H_SAY "! zip not found, so this release has no offline package."
 fi
 
 # ============================================================================
