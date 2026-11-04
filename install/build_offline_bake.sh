@@ -87,9 +87,14 @@ if [ -n "$hits" ]; then
 fi
 
 # --- 4. Head + payload ---
+# macOS's tar (bsdtar) stores Finder metadata like com.apple.provenance as
+# extended headers, and GNU tar on the cluster warns about every one of them.
+# Leave all of it out, so the payload is plain files.
+TAR_CLEAN=()
+tar --version 2>/dev/null | grep -q bsdtar && TAR_CLEAN=(--no-xattrs --no-mac-metadata --no-acls)
 {
     cat "$WORK/head"
     echo "__PAYLOAD__"
-    COPYFILE_DISABLE=1 tar -czf - -C "$KITCHEN" . | base64
+    COPYFILE_DISABLE=1 tar ${TAR_CLEAN[@]+"${TAR_CLEAN[@]}"} -czf - -C "$KITCHEN" . | base64
 } > "$OUT"
 chmod +x "$OUT"
