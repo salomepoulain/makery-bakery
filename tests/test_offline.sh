@@ -85,6 +85,13 @@ if grep -rhE 'git (clone|pull|push|fetch)|curl|wget|github\.com' "$OFFLINE_KITCH
 fi
 pass "the offline bake has no update code, no GitHub orders and no git clone"
 
+# GNU tar on a cluster warns about every macOS extended header (com.apple.*).
+if awk '/^__PAYLOAD__$/{flag=1; next} flag' "$OFFLINE_BAKE" | base64 -d | gunzip 2>/dev/null \
+    | strings | grep -qE 'LIBARCHIVE\.xattr|com\.apple'; then
+    fail "the offline payload carries macOS metadata that GNU tar warns about"
+fi
+pass "the offline payload has no macOS metadata"
+
 # A kitchen with network code left in it must not become an offline bake.
 LEAKY="$TEMP_DIR/leaky"
 mkdir -p "$LEAKY"
