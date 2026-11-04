@@ -119,7 +119,8 @@ H_SAY "✓ Checksum: $(cat "$CHECKSUM_PATH")"
 # OFFLINE PACKAGE (for machines that can only download a zip in a browser)
 # ============================================================================
 # makery-bakery-offline.zip holds one folder, makery-bakery/, with an offline
-# bake and every Station from the registry that passes `bake safe`'s scan.
+# bake, every Station from the registry that passes `bake safe`'s scan, and the
+# makery-kitchen-explorer .vsix.
 # Unzip it, drag it into your home on the cluster, rename it to .makery-bakery.
 OFFLINE_ZIP="$ARCHIVE_DIR/makery-bakery-offline-$VERSION.zip"
 OFFLINE_ASSET=()
@@ -160,6 +161,17 @@ else
         [ ${#LEFT_OUT[@]} -gt 0 ] && H_SAY "  Left out (failed the scan): ${LEFT_OUT[*]}"
     else
         H_SAY "! Couldn't clone the registry ($MAKERY_REGISTRY), the package has no Stations."
+    fi
+
+    # The makery-kitchen-explorer VS Code extension, from its latest release, so a
+    # machine without a marketplace can "Install from VSIX…" (no npm needed).
+    gh release download -R salomepoulain/makery-kitchen-explorer --pattern '*.vsix' \
+        --dir "$PKG" > /dev/null 2>&1 || true
+    VSIX=("$PKG"/*.vsix)
+    if [ -f "${VSIX[0]}" ]; then
+        H_SAY "✓ Added the explorer: $(basename "${VSIX[0]}")"
+    else
+        H_SAY "! Couldn't get the makery-kitchen-explorer .vsix, so the package has no extension."
     fi
 
     # Zip it under a visible name: a folder starting with a dot hides after

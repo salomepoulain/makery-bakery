@@ -171,8 +171,18 @@ BLOCK="$PKG_TEST/multi/makery/headchef/orders/package_block.sh"
     echo 'echo "ASSET=${OFFLINE_ASSET[0]}"'
 } > "$BLOCK"
 (cd "$REG" && git init -q && git add -A && git -c user.email=t@t -c user.name=t commit -qm stations)
-run env -u MAKERY_OFFLINE MAKERY_REGISTRY="$REG" TEMP_DIR="$PKG_TEST" ARCHIVE_DIR="$PKG_TEST/archives" \
-    VERSION=vtest TARBALL_PATH="$PKG_TEST/makery.tar.gz" bash "$BLOCK"
+# A stand-in gh: `gh release download ... --dir D` drops a fake explorer .vsix in D.
+STUB="$TEMP_DIR/stub-bin"
+mkdir -p "$STUB"
+cat > "$STUB/gh" << 'EOF'
+#!/bin/bash
+[ "$1 $2" = "release download" ] || exit 1
+while [ $# -gt 0 ]; do [ "$1" = "--dir" ] && dir="$2"; shift; done
+echo "fake vsix" > "$dir/makery-kitchen-explorer-9.9.9.vsix"
+EOF
+chmod +x "$STUB/gh"
+run env -u MAKERY_OFFLINE PATH="$STUB:$PATH" MAKERY_REGISTRY="$REG" TEMP_DIR="$PKG_TEST" \
+    ARCHIVE_DIR="$PKG_TEST/archives" VERSION=vtest TARBALL_PATH="$PKG_TEST/makery.tar.gz" bash "$BLOCK"
 [ "$STATUS" -eq 0 ] || fail "the offline package block failed"
 ZIP="$PKG_TEST/makery-bakery-offline.zip"
 [ -f "$ZIP" ] || fail "no makery-bakery-offline.zip was built"
@@ -182,6 +192,8 @@ echo "$LIST" | grep -qx "makery-bakery/bake" || fail "the zip has no makery-bake
 echo "$LIST" | grep -q "^makery-bakery/stations/good/" || fail "the zip is missing the good station"
 if echo "$LIST" | grep -q "^makery-bakery/stations/bad/"; then fail "the zip contains the bad station"; fi
 pass "bake release builds makery-bakery-offline.zip with only the stations that pass the scan"
+echo "$LIST" | grep -qx "makery-bakery/makery-kitchen-explorer-9.9.9.vsix" || fail "the zip has no explorer .vsix"
+pass "the zip carries the makery-kitchen-explorer .vsix"
 
 # Like on the cluster: a fresh home, unzip, rename, chmod, hire.
 export HOME="$TEMP_DIR/cluster-home"
