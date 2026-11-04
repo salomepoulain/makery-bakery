@@ -105,5 +105,45 @@ for order in in request release safe; do
 done
 pass "offline bake refuses in, request, release and safe"
 
+# --- The offline package that `bake release` builds ---
+# Run release.sh's OFFLINE PACKAGE block on its own, against the fake registry,
+# then use the zip the way a machine with only a browser would.
+PKG_TEST="$TEMP_DIR/release"
+mkdir -p "$PKG_TEST/multi" "$PKG_TEST/archives"
+cp -R "$PROJECT_ROOT/makery" "$PROJECT_ROOT/install" "$PKG_TEST/multi/"
+tar -czf "$PKG_TEST/makery.tar.gz" -C "$PROJECT_ROOT/makery" .
+BLOCK="$PKG_TEST/multi/makery/headchef/orders/package_block.sh"
+{
+    # shellcheck disable=SC2016 # written out literally, expanded when the block runs
+    echo 'source "$(dirname "${BASH_SOURCE[0]}")/../personality.sh"'
+    awk '/^# OFFLINE PACKAGE/{flag=1} /^# PUBLISH GITHUB RELEASE/{flag=0} flag' \
+        "$PROJECT_ROOT/makery/headchef/orders/release.sh" | sed '$d'
+    # shellcheck disable=SC2016
+    echo 'echo "ASSET=${OFFLINE_ASSET[0]}"'
+} > "$BLOCK"
+(cd "$REG" && git init -q && git add -A && git -c user.email=t@t -c user.name=t commit -qm stations)
+run env -u MAKERY_OFFLINE MAKERY_REGISTRY="$REG" TEMP_DIR="$PKG_TEST" ARCHIVE_DIR="$PKG_TEST/archives" \
+    VERSION=vtest TARBALL_PATH="$PKG_TEST/makery.tar.gz" bash "$BLOCK"
+[ "$STATUS" -eq 0 ] || fail "the offline package block failed"
+ZIP="$PKG_TEST/makery-bakery-offline.zip"
+[ -f "$ZIP" ] || fail "no makery-bakery-offline.zip was built"
+echo "$OUT" | grep -q "ASSET=$ZIP" || fail "the zip is not passed on as a release asset"
+LIST=$(unzip -Z1 "$ZIP")
+echo "$LIST" | grep -qx "makery-bakery/bake" || fail "the zip has no makery-bakery/bake"
+echo "$LIST" | grep -q "^makery-bakery/stations/good/" || fail "the zip is missing the good station"
+if echo "$LIST" | grep -q "^makery-bakery/stations/bad/"; then fail "the zip contains the bad station"; fi
+pass "bake release builds makery-bakery-offline.zip with only the stations that pass the scan"
+
+# Like on the cluster: a fresh home, unzip, rename, chmod, hire.
+export HOME="$TEMP_DIR/cluster-home"
+mkdir -p "$HOME" && cd "$HOME"
+unzip -q "$ZIP" && mv makery-bakery .makery-bakery && chmod +x .makery-bakery/bake
+grep -q '^BAKE_OFFLINE=1$' .makery-bakery/bake || fail "the packaged bake is not offline"
+grep -q '^BAKE_VERSION="vtest"$' .makery-bakery/bake || fail "the packaged bake has no version"
+mkdir -p "$TEMP_DIR/cluster2" && cd "$TEMP_DIR/cluster2"
+run "$HOME/.makery-bakery/bake" first good
+{ [ "$STATUS" -eq 0 ] && [ -f hired-good.txt ]; } || fail "the packaged offline bake could not hire good"
+pass "the unzipped package hires on a machine without internet"
+
 echo ""
 echo "All offline registry tests passed!"

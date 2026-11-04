@@ -120,6 +120,7 @@ Each release publishes:
 - `makery-bakery-<tag>.tar.gz`: the makery payload (the `makery/` folder, unprefixed)
 - `makery-bakery-<tag>.tar.gz.sha256`: its checksum
 - `install_bake.sh`: the installer, with the payload embedded at build time
+- `makery-bakery-offline.zip`: an offline bake plus every Station that passes `bake safe`'s scan, for [a cluster without internet](#makery-bakery-on-a-cluster-without-internet)
 
 Manual verification:
 
@@ -130,7 +131,7 @@ curl -sSL -O https://github.com/salomepoulain/makery-bakery/releases/download/$T
 sha256sum -c makery-bakery-$TAG.tar.gz.sha256
 ```
 
-Releases are date-versioned and published directly by the maintainer with `bake release`, no CI workflow is involved: it tags `main`, builds the tarball and checksum from `makery/`, and pushes a GitHub Release with all three assets in one step.
+Releases are date-versioned and published directly by the maintainer with `bake release`, no CI workflow is involved: it tags `main`, builds the tarball and checksum from `makery/` and the offline package, and pushes a GitHub Release with all four assets in one step.
 
 ## Stations run code, and agents can run bake
 
@@ -349,9 +350,17 @@ export MAKERY_REGISTRY=<you>/<your-stations>
 
 Some machines may not reach the internet, or shouldn't: a secured cluster, a server behind a strict firewall. For those there's an **offline registry**, a plain folder at `~/.makery-bakery`, and an **offline bake** that hires only from that folder and never touches the network.
 
-You fill the offline registry on a machine that does have internet, then copy it over yourself.
+There are two ways to get that folder. Pick the first if the computer you reach the cluster from can't install `bake` (no `make`, no permission to install software). It only needs a browser.
 
-**1. On your own machine, with internet**, install `bake` as usual (see [Getting started](#getting-started)), then pick the Stations you want on the cluster:
+**1a. Download the ready-made package.** Every release has a `makery-bakery-offline.zip`, with an offline bake and the Stations from [salomepoulain/makery-stations](https://github.com/salomepoulain/makery-stations), the default registry. Only the ones that pass the scan described below are in it; when this was written that's `python`, `latex` and `vault`. The newest package is always at:
+
+```
+https://github.com/salomepoulain/makery-bakery/releases/latest/download/makery-bakery-offline.zip
+```
+
+Unzip it. You get a folder `makery-bakery/` with `bake` and `stations/` in it. Delete the Station folders you don't want, then go to step 2. The folder is called `makery-bakery` without the dot so it doesn't hide itself after unzipping. You rename it on the cluster.
+
+**1b. Or build it yourself**, on a machine with internet and `bake` installed (see [Getting started](#getting-started)). This also works with your own registry, and lets you force a Station in. Pick the Stations you want on the cluster:
 
 ```bash
 bake safe python
@@ -377,14 +386,21 @@ Every `bake safe` also writes an offline copy of your `bake` to `~/.makery-baker
     └── latex/
 ```
 
-Copy the whole `.makery-bakery` folder as it is. Don't copy it into a project, and don't copy a project's `.makery/` folder: the offline bake makes that itself in every project you run it in.
+Copy the whole folder as it is. Don't copy it into a project, and don't copy a project's `.makery/` folder: the offline bake makes that itself in every project you run it in.
 
-*By dragging, in VS Code with Remote-SSH.* No terminal command needed:
+*By dragging, in VS Code with Remote-SSH:*
 
 1. Open a Remote-SSH window to the cluster and open your home folder there ("File > Open Folder…", then `~`).
-2. Find `.makery-bakery` on your own machine. It's hidden: in Finder press `Cmd+Shift+.` to show hidden folders, in Windows Explorer turn on "Hidden items" under View.
-3. Drag the `.makery-bakery` folder onto the empty space in VS Code's Explorer, so it lands directly in your home folder, not inside another folder.
-4. Dragging may drop the "executable" mark on `bake`. Open a terminal in the Remote-SSH window and run once:
+2. Drag the folder onto the empty space in VS Code's Explorer, so it lands directly in your home folder, not inside another folder.
+   - From the zip (1a): drag `makery-bakery`.
+   - Built yourself (1b): drag `.makery-bakery`. It's hidden: in Finder press `Cmd+Shift+.`, in Windows Explorer turn on "Hidden items" under View.
+3. Open a terminal in the Remote-SSH window. From the zip, rename the folder first, replacing an older one if it's there:
+
+```bash
+rm -rf ~/.makery-bakery && mv ~/makery-bakery ~/.makery-bakery
+```
+
+4. Dragging may drop the "executable" mark on `bake`, so run once:
 
 ```bash
 chmod +x ~/.makery-bakery/bake
@@ -396,7 +412,7 @@ chmod +x ~/.makery-bakery/bake
 rsync -av ~/.makery-bakery/ <host>:~/.makery-bakery/
 ```
 
-After every new `bake safe`, copy again. When dragging, let VS Code replace the existing files, run the `chmod` again, and delete a Station's folder on the cluster by hand if you no longer want it there.
+To update, download a newer zip or run `bake safe` again, and copy the folder again. With your own `.makery-bakery`, let VS Code replace the existing files and delete a Station's folder on the cluster by hand if you no longer want it there. Run the `chmod` again either way.
 
 **3. On the cluster, once**, put the offline bake on your `PATH`, for example in `~/.bashrc`:
 
@@ -407,7 +423,7 @@ export PATH="$HOME/.makery-bakery:$PATH"
 Then use `bake` in a project as usual. The offline bake:
 
 - hires (`bake first`) and lists (`bake inspo`) only from `~/.makery-bakery`. It ignores `MAKERY_REGISTRY`.
-- never checks for updates and refuses `bake update`. To update it, run `bake safe` on your own machine and copy the folder again.
+- never checks for updates and refuses `bake update`. To update it, get a newer package (1a or 1b) and copy it again.
 - refuses everything that needs GitHub: `bake in`, `bake request`, `bake release` and `bake safe`.
 - runs everything else as usual: `burnt`, `germs`, `shady`, `station` and every Station skill.
 
