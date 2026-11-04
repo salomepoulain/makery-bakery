@@ -116,6 +116,65 @@ sha256sum "$TARBALL_PATH" | awk '{print $1}' > "$CHECKSUM_PATH"
 H_SAY "✓ Checksum: $(cat "$CHECKSUM_PATH")"
 
 # ============================================================================
+# OFFLINE PACKAGE (for machines that can only download a zip in a browser)
+# ============================================================================
+# makery-bakery-offline.zip holds one folder, makery-bakery/, with an offline
+# bake and every Station from the registry that passes `bake safe`'s scan.
+# Unzip it, drag it into your home on the cluster, rename it to .makery-bakery.
+OFFLINE_ZIP="$ARCHIVE_DIR/makery-bakery-offline-$VERSION.zip"
+OFFLINE_ASSET=()
+if command -v zip > /dev/null 2>&1; then
+    H_SAY "Building the offline package..."
+    PKG_HOME="$TEMP_DIR/offline-home"
+    PKG="$PKG_HOME/.makery-bakery"
+    mkdir -p "$PKG/stations"
+
+    # The offline bake: the same binary install_bake.sh writes, flipped to offline.
+    {
+        awk "/^  cat << '__BAKE_HEAD_EOF__'\$/{flag=1;next} /^__BAKE_HEAD_EOF__\$/{flag=0} flag" \
+            "$TEMP_DIR/multi/install/install_bake.sh" \
+            | sed -e "s/__BAKE_VERSION__/$VERSION/" -e 's/^BAKE_OFFLINE=0$/BAKE_OFFLINE=1/'
+        echo "__PAYLOAD__"
+        base64 < "$TARBALL_PATH"
+    } > "$PKG/bake"
+    chmod +x "$PKG/bake"
+
+    # Every registry Station that passes this release's own `bake safe` scan.
+    # shellcheck source=../registry.sh
+    source "$(dirname "${BASH_SOURCE[0]}")/../registry.sh"
+    PKG_REGISTRY="$TEMP_DIR/registry"
+    if git clone --depth 1 --quiet "$REGISTRY_URL" "$PKG_REGISTRY" 2>/dev/null; then
+        PASSED=()
+        LEFT_OUT=()
+        for dir in "$PKG_REGISTRY"/stations/*/; do
+            name=$(basename "$dir")
+            [ "$name" = "_empty_station" ] && continue
+            if HOME="$PKG_HOME" MAKERY_REGISTRY="$PKG_REGISTRY" \
+                bash "$TEMP_DIR/multi/makery/headchef/orders/safe.sh" "$name" "" > /dev/null 2>&1; then
+                PASSED+=("$name")
+            else
+                LEFT_OUT+=("$name")
+            fi
+        done
+        H_SAY "✓ In the package: ${PASSED[*]:-none}"
+        [ ${#LEFT_OUT[@]} -gt 0 ] && H_SAY "  Left out (failed the scan): ${LEFT_OUT[*]}"
+    else
+        H_SAY "! Couldn't clone the registry ($MAKERY_REGISTRY), the package has no Stations."
+    fi
+
+    # Zip it under a visible name: a folder starting with a dot hides after
+    # unzipping. The asset keeps one fixed name, so releases/latest/download/
+    # makery-bakery-offline.zip always points at the newest one.
+    mv "$PKG" "$PKG_HOME/makery-bakery"
+    (cd "$PKG_HOME" && zip -qr "$TEMP_DIR/makery-bakery-offline.zip" makery-bakery)
+    cp "$TEMP_DIR/makery-bakery-offline.zip" "$OFFLINE_ZIP"
+    OFFLINE_ASSET=("$TEMP_DIR/makery-bakery-offline.zip")
+    H_SAY "✓ Saved: $OFFLINE_ZIP ($(du -h "$OFFLINE_ZIP" | cut -f1))"
+else
+    H_SAY "! zip not found, so this release has no offline package."
+fi
+
+# ============================================================================
 # PUBLISH GITHUB RELEASE
 # ============================================================================
 # No CI workflow publishes this anymore (release.yml was removed) — this
@@ -129,6 +188,7 @@ gh release create "$VERSION" \
     "$TARBALL_PATH" \
     "$CHECKSUM_PATH" \
     "$TEMP_DIR/multi/install/install_bake.sh" \
+    "${OFFLINE_ASSET[@]}" \
     || { H_SAY "Failed to publish release $VERSION"; exit 1; }
 H_SAY "✓ Release published: https://github.com/$MULTI_REPO/releases/tag/$VERSION"
 
