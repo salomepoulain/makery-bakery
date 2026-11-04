@@ -352,7 +352,7 @@ Some machines may not reach the internet, or shouldn't: a secured cluster, a ser
 
 There are two ways to get that folder. Pick the first if the computer you reach the cluster from can't install `bake` (no `make`, no permission to install software). It only needs a browser.
 
-**1a. Download the ready-made package.** Every release has a `makery-bakery-offline.zip`, with an offline bake and every Station from the default registry that passes the scan described below. The newest one is always at:
+**1a. Download the ready-made package.** Every release has a `makery-bakery-offline.zip`, with an offline bake and the Stations from [salomepoulain/makery-stations](https://github.com/salomepoulain/makery-stations), the default registry. Only the ones that pass the scan described below are in it; when this was written that's `python`, `latex` and `vault`. The newest package is always at:
 
 ```
 https://github.com/salomepoulain/makery-bakery/releases/latest/download/makery-bakery-offline.zip
