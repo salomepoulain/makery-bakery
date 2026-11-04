@@ -205,6 +205,12 @@ _bake_refresh_kitchen() {
 _bake_extract() {
     mkdir -p .makery
     mkdir -p __trash__
+    # Keep the kitchen and the scratch folder out of git, in a git project.
+    if [ -f .gitignore ] || [ -d .git ]; then
+        [ -s .gitignore ] && [ -n "$(tail -c 1 .gitignore)" ] && echo >> .gitignore
+        grep -qxE '/?\.makery/?' .gitignore 2>/dev/null || echo ".makery/" >> .gitignore
+        grep -qxE '/?__trash__/?' .gitignore 2>/dev/null || echo "__trash__/" >> .gitignore
+    fi
     # >>> online-only
     local src="" tmp=""
     if _bake_check_upgrade; then
