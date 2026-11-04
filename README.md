@@ -374,13 +374,36 @@ bake safe latex
 
 Every `bake safe` also writes an offline copy of your `bake` to `~/.makery-bakery/bake`. So the folder holds everything the cluster needs.
 
-**2. Copy the folder to the cluster.** `bake safe` prints this command at the end:
+**2. Copy the folder to the cluster.** Whatever way you copy it, the cluster needs exactly this, in your home folder:
+
+```
+~/.makery-bakery/
+├── bake            the offline bake
+└── stations/
+    ├── python/     one folder per Station you made safe
+    └── latex/
+```
+
+Copy the whole `.makery-bakery` folder as it is. Don't copy it into a project, and don't copy a project's `.makery/` folder: the offline bake makes that itself in every project you run it in.
+
+*By dragging, in VS Code with Remote-SSH.* No terminal command needed:
+
+1. Open a Remote-SSH window to the cluster and open your home folder there ("File > Open Folder…", then `~`).
+2. Find `.makery-bakery` on your own machine. It's hidden: in Finder press `Cmd+Shift+.` to show hidden folders, in Windows Explorer turn on "Hidden items" under View.
+3. Drag the `.makery-bakery` folder onto the empty space in VS Code's Explorer, so it lands directly in your home folder, not inside another folder.
+4. Dragging may drop the "executable" mark on `bake`. Open a terminal in the Remote-SSH window and run once:
+
+```bash
+chmod +x ~/.makery-bakery/bake
+```
+
+*With rsync*, if you're allowed to. `bake safe` prints this command at the end:
 
 ```bash
 rsync -av ~/.makery-bakery/ <host>:~/.makery-bakery/
 ```
 
-Run it again whenever you `bake safe` something new.
+After every new `bake safe`, copy again. When dragging, let VS Code replace the existing files, run the `chmod` again, and delete a Station's folder on the cluster by hand if you no longer want it there.
 
 **3. On the cluster, once**, put the offline bake on your `PATH`, for example in `~/.bashrc`:
 
@@ -391,9 +414,9 @@ export PATH="$HOME/.makery-bakery:$PATH"
 Then use `bake` in a project as usual. The offline bake:
 
 - hires (`bake first`) and lists (`bake inspo`) only from `~/.makery-bakery`. It ignores `MAKERY_REGISTRY`.
-- never checks for updates and refuses `bake update`. To update it, run `bake safe` on your own machine and rsync again.
+- never checks for updates and refuses `bake update`. To update it, run `bake safe` on your own machine and copy the folder again.
 - refuses everything that needs GitHub: `bake in`, `bake request`, `bake release` and `bake safe`.
-- runs everything else as usual: `burnt`, `germs`, `shady`, `station`, `all` and every Station skill.
+- runs everything else as usual: `burnt`, `germs`, `shady`, `station` and every Station skill.
 
 The offline mode is written into the binary itself, not set with an environment variable, so it can't be switched off by accident.
 

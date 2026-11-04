@@ -298,8 +298,9 @@ _bake_write_offline() {
     sed 's/^BAKE_OFFLINE=0$/BAKE_OFFLINE=1/' "$0" > "$dir/.bake.tmp" || return 1
     chmod +x "$dir/.bake.tmp" && mv "$dir/.bake.tmp" "$dir/bake"
     echo "Offline bake written to $dir/bake ($BAKE_VERSION)."
-    echo "Put it on your cluster with:"
-    echo "  rsync -av ~/.makery-bakery/ <host>:~/.makery-bakery/"
+    echo "Put the whole ~/.makery-bakery folder in your home folder on the cluster:"
+    echo "  drag it into a VS Code Remote-SSH window, then run: chmod +x ~/.makery-bakery/bake"
+    echo "  or: rsync -av ~/.makery-bakery/ <host>:~/.makery-bakery/"
 }
 
 # Handle `bake update`: always fetch + install the latest release.
