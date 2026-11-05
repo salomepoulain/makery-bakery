@@ -188,6 +188,10 @@ BLOCK="$PKG_TEST/multi/makery/headchef/orders/package_block.sh"
     # shellcheck disable=SC2016
     echo 'echo "ASSET=${OFFLINE_ASSET[0]}"'
 } > "$BLOCK"
+# A clean vscode station: the explorer .vsix belongs in its pantry.
+mkdir -p "$REG/stations/vscode/workbench/pantry"
+printf 'menu::\n\t@true\n' > "$REG/stations/vscode/menu.mk"
+echo "{}" > "$REG/stations/vscode/workbench/pantry/settings.json"
 (cd "$REG" && git init -q && git add -A && git -c user.email=t@t -c user.name=t commit -qm stations)
 # A stand-in gh: `gh release download ... --dir D` drops a fake explorer .vsix in D.
 STUB="$TEMP_DIR/stub-bin"
@@ -210,8 +214,10 @@ echo "$LIST" | grep -qx "makery-bakery/bake" || fail "the zip has no makery-bake
 echo "$LIST" | grep -q "^makery-bakery/stations/good/" || fail "the zip is missing the good station"
 if echo "$LIST" | grep -q "^makery-bakery/stations/bad/"; then fail "the zip contains the bad station"; fi
 pass "bake release builds makery-bakery-offline.zip with only the stations that pass the scan"
-echo "$LIST" | grep -qx "makery-bakery/makery-kitchen-explorer-9.9.9.vsix" || fail "the zip has no explorer .vsix"
-pass "the zip carries the makery-kitchen-explorer .vsix"
+echo "$LIST" | grep -qx "makery-bakery/stations/vscode/workbench/pantry/makery-kitchen-explorer-9.9.9.vsix" \
+    || fail "the explorer .vsix is not in the vscode pantry"
+if echo "$LIST" | grep -qx "makery-bakery/makery-kitchen-explorer-9.9.9.vsix"; then fail "the .vsix is also loose in the zip"; fi
+pass "the zip carries the makery-kitchen-explorer .vsix in the vscode pantry"
 
 # Like on the cluster: a fresh home, unzip, rename, chmod, hire.
 export HOME="$TEMP_DIR/cluster-home"
@@ -226,6 +232,10 @@ mkdir -p "$TEMP_DIR/cluster2" && cd "$TEMP_DIR/cluster2"
 run "$HOME/.makery-bakery/bake" first good
 { [ "$STATUS" -eq 0 ] && [ -f hired-good.txt ]; } || fail "the packaged offline bake could not hire good"
 pass "the unzipped package hires on a machine without internet"
+run "$HOME/.makery-bakery/bake" first vscode
+[ -f .makery/stations/vscode/workbench/pantry/makery-kitchen-explorer-9.9.9.vsix ] \
+    || fail "bake first vscode did not bring the .vsix into the kitchen"
+pass "bake first vscode puts the explorer .vsix in the kitchen"
 
 echo ""
 echo "All offline registry tests passed!"

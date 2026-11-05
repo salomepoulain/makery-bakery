@@ -165,9 +165,13 @@ else
 
     # The makery-kitchen-explorer VS Code extension, from its latest release, so a
     # machine without a marketplace can "Install from VSIX…" (no npm needed).
+    # It goes in the vscode pantry, so `bake first vscode` brings it along; loose
+    # in the package if the vscode Station didn't make it in.
+    VSIX_DIR="$PKG"
+    [ -d "$PKG/stations/vscode/workbench/pantry" ] && VSIX_DIR="$PKG/stations/vscode/workbench/pantry"
     gh release download -R salomepoulain/makery-kitchen-explorer --pattern '*.vsix' \
-        --dir "$PKG" > /dev/null 2>&1 || true
-    VSIX=("$PKG"/*.vsix)
+        --dir "$VSIX_DIR" > /dev/null 2>&1 || true
+    VSIX=("$VSIX_DIR"/*.vsix)
     if [ -f "${VSIX[0]}" ]; then
         H_SAY "✓ Added the explorer: $(basename "${VSIX[0]}")"
     else

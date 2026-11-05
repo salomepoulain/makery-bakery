@@ -120,7 +120,7 @@ Each release publishes:
 - `makery-bakery-<tag>.tar.gz`: the makery payload (the `makery/` folder, unprefixed)
 - `makery-bakery-<tag>.tar.gz.sha256`: its checksum
 - `install_bake.sh`: the installer, with the payload embedded at build time
-- `makery-bakery-offline.zip`: an offline bake, every Station that passes `bake safe`'s scan, and the [makery-kitchen-explorer](https://github.com/salomepoulain/makery-kitchen-explorer) `.vsix`, for [a cluster without internet](#makery-bakery-on-a-cluster-without-internet)
+- `makery-bakery-offline.zip`: an offline bake, every Station that passes `bake safe`'s scan, and the [makery-kitchen-explorer](https://github.com/salomepoulain/makery-kitchen-explorer) `.vsix` in the vscode Station's pantry, for [a cluster without internet](#makery-bakery-on-a-cluster-without-internet)
 
 Manual verification:
 
@@ -358,7 +358,7 @@ There are two ways to get that folder. Pick the first if the computer you reach 
 https://github.com/salomepoulain/makery-bakery/releases/latest/download/makery-bakery-offline.zip
 ```
 
-Unzip it. You get a folder `makery-bakery/` with `bake`, `stations/` and `makery-kitchen-explorer-<version>.vsix` in it. Delete the Station folders you don't want, then go to step 2. The folder is called `makery-bakery` without the dot so it doesn't hide itself after unzipping. You rename it on the cluster.
+Unzip it. You get a folder `makery-bakery/` with `bake` and `stations/` in it. The makery-kitchen-explorer `.vsix` is in `stations/vscode/workbench/pantry/`. Delete the Station folders you don't want, then go to step 2. The folder is called `makery-bakery` without the dot so it doesn't hide itself after unzipping. You rename it on the cluster.
 
 **1b. Or pick the Stations yourself**, on a machine with internet and `bake` installed (see [Getting started](#getting-started)). This also works with your own registry, and lets you force a Station in. Pick the Stations you want on the cluster:
 
@@ -420,7 +420,7 @@ To update, download a newer zip or run `bake safe` again, and copy the folder ag
 export PATH="$HOME/.makery-bakery:$PATH"
 ```
 
-To see in VS Code's Explorer which files are ignored, germs or stashed, install the makery-kitchen-explorer extension from the `.vsix` in the folder. In your Remote-SSH window: right-click `~/.makery-bakery/makery-kitchen-explorer-<version>.vsix` in the Explorer and choose "Install Extension VSIX". No npm or marketplace needed. It only runs local `git` commands.
+To see in VS Code's Explorer which files are ignored, germs or stashed, install the makery-kitchen-explorer extension from its `.vsix`. Run `bake first vscode` in your project, then in your Remote-SSH window right-click `.makery/stations/vscode/workbench/pantry/makery-kitchen-explorer-<version>.vsix` in the Explorer and choose "Install Extension VSIX". No npm or marketplace needed. It only runs local `git` commands.
 
 Then use `bake` in a project as usual. The offline bake:
 
